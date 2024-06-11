@@ -6,7 +6,7 @@ services:
     volumes:
       - ./production/nginx:/etc/nginx/conf.d
       - ./front-end:/var/www/front-end
-      - ./certs:/certs
+      - ./certs/certs:/certs
     ports:
       - "80:80"
 
