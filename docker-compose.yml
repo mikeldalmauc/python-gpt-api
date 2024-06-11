@@ -8,8 +8,8 @@ services:
       - ./front-end:/var/www/front-end
       - ./certs/certs:/certs
     ports:
-      - "80:80"
-
+      - "80:80" 
+      - "443:443"
   back-end:
     build: .
     volumes:
