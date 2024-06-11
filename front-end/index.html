@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>API Request Example</title>
+</head>
+<body>
+   <h1>Book List</h1>
+   <ul id="bookList"></ul>
+
+   <script>
+      document.addEventListener("DOMContentLoaded", function () {
+            // Function to make the API request
+            function fetchBooks() {
+               fetch('http://localhost/api/books')
+                  .then(response => response.json())
+                  .then(data => displayBooks(data))
+                  .catch(error => console.error('Error fetching books:', error));
+            }
+
+            // Function to display the retrieved books
+            function displayBooks(books) {
+               const bookList = document.getElementById('bookList');
+
+               books.forEach(book => {
+                  const listItem = document.createElement('li');
+                  listItem.textContent = `${book.title} (ID: ${book.id})`;
+                  bookList.appendChild(listItem);
+               });
+            }
+
+            // Call the fetchBooks function when the page is loaded
+            fetchBooks();
+      });
+   </script>
+</body>
+</html>

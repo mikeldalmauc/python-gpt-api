@@ -1,0 +1,17 @@
+version: '4.4.2'
+
+services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./front-end:/var/www/front-end
+    ports:
+      - "80:80"
+
+  back-end:
+    build: .
+    volumes:
+      - ./production/.env:/api-flask/.env
+    expose:
+      - "5000"
