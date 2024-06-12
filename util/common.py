@@ -10,6 +10,7 @@ class ENVIRONMENT:
         self.domain = os.getenv("DOMAIN")
         self.port = os.getenv("PORT")
         self.prefix = os.getenv("PREFIX")
+        self.protocol = os.getenv("PROTOCOL")
 
     def get_instance(self):
         if not hasattr(self, "_instance"):
@@ -25,9 +26,14 @@ class ENVIRONMENT:
     def getPrefix(self):
         return self.prefix
 
+    def getProtocol(self):
+        return self.protocol
+
+
 domain = ENVIRONMENT().get_instance().getDomain()
 port = ENVIRONMENT().get_instance().getPort()
 prefix = ENVIRONMENT().get_instance().getPrefix()
+protocol = ENVIRONMENT().get_instance().getProtocol()
 
 def build_swagger_config_json():
     config_file_path = 'static/swagger/config.json'
@@ -36,8 +42,8 @@ def build_swagger_config_json():
         config_data = json.load(file)
 
     config_data['servers'] = [
-        {"url": f"https://localhost:{port}{prefix}"},
-        {"url": f"https://{domain}:{port}{prefix}"}
+        {"url": f"{protocol}://localhost:{port}{prefix}"},
+        {"url": f"{protocol}://{domain}:{port}{prefix}"}
     ]
 
     new_config_file_path = 'static/swagger/config.json'

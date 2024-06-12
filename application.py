@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, redirect
 from flask_restful import Api, MethodNotAllowed, NotFound
 from flask_cors import CORS
-from util.common import domain, port, prefix, build_swagger_config_json
+from util.common import domain, port, prefix, protocol, build_swagger_config_json
 from resources.swaggerConfig import SwaggerConfig
 from resources.bookResource import BooksGETResource, BookGETResource, BookPOSTResource, BookPUTResource, BookDELETEResource
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -21,7 +21,7 @@ api = Api(app, prefix=prefix, catch_all_404s=True)
 build_swagger_config_json()
 swaggerui_blueprint = get_swaggerui_blueprint(
      prefix,
-     f'https://{domain}:{port}{prefix}/swagger-config',
+     f'{protocol}://{domain}:{port}{prefix}/swagger-config',
       config={
           'app_name': "Flask API",
             "layout": "BaseLayout",

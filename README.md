@@ -1,4 +1,5 @@
 - [Python flask app](#python-flask-app)
+  - [Run flask with gunicorn](#run-flask-with-gunicorn)
   - [deploy](#deploy)
 - [AWS](#aws)
   - [public EC2 instance DNS](#public-ec2-instance-dns)
@@ -8,6 +9,11 @@
 # Python flask app 
 
 Refer to the [following guide](https://github.com/geeekfa/Api-Flask)
+## Run flask with gunicorn
+
+```bash
+gunicorn application:app -b 0.0.0.0:5000
+```
 
 ## deploy
 
