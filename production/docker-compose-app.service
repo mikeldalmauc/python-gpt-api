@@ -5,15 +5,11 @@ Requires=docker.service
 
 [Service]
 WorkingDirectory=/home/ec2-user/python-gpt-api
-ExecStart=/usr/local/bin/docker-compose up -d --build
+ExecStart=/usr/local/bin/docker-compose up
 ExecStop=/usr/local/bin/docker-compose down
 Restart=always
-TimeoutStartSec=0
 User=ec2-user
 Group=ec2-user
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=docker-compose-app
 
 [Install]
 WantedBy=multi-user.target
