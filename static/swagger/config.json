@@ -9,7 +9,7 @@
       "url": "http://localhost:5000"
     },
     {
-      "url": "http://localhost:5000"
+      "url": "https://ec2-35-181-229-140.eu-west-3.compute.amazonaws.com:5000"
     }
   ],
   "tags": [
