@@ -4,15 +4,17 @@
 - [AWS](#aws)
   - [public EC2 instance DNS](#public-ec2-instance-dns)
   - [Connect to machine through ssh](#connect-to-machine-through-ssh)
+  - [Configure compose service on startup](#configure-compose-service-on-startup)
 
 
 # Python flask app 
 
 Refer to the [following guide](https://github.com/geeekfa/Api-Flask)
+
 ## Run flask with gunicorn
 
 ```bash
-gunicorn application:app -b 0.0.0.0:5000
+gunicorn application:app -b localhost:5000
 ```
 
 ## deploy
@@ -29,19 +31,40 @@ After deploying app to the server, open a terminal in the server and install the
 pip3 install -r requirements.txt
 ```
 
-Build the docker app.
+Build the docker-compose app.
 
 ```bash
-sudo docker build -t api-flask .
+docker-compose up -d --build
 ```
 # AWS 
 
 ## public EC2 instance DNS
 
-ec2-35-181-229-140.eu-west-3.compute.amazonaws.com
+ec2-{ip}.eu-west-3.compute.amazonaws.com
 
 ## Connect to machine through ssh
 
 ```bash
-ssh -i "aws-flask-gpt-api.pem" ec2-user@ec2-35-181-229-140.eu-west-3.compute.amazonaws.com
+ssh -i "aws-flask-gpt-api.pem" ec2-user@ec2-{ip}.eu-west-3.compute.amazonaws.com
+```
+
+## Configure compose service on startup
+
+Create the file with the service configuration, the content can be found at [docker-compose-app.service](production/docker-compose-app.service)
+
+```bash
+sudo nano /etc/systemd/system/docker-compose-app.service
+```
+
+Enable and start the service
+
+```bash
+sudo systemctl enable docker-compose-app.service
+sudo systemctl start docker-compose-app.service
+```
+
+Check the service started correctly
+
+```bash
+docker ps
 ```
