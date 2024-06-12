@@ -32,10 +32,10 @@ sudo docker build -t api-flask .
 
 ## public EC2 instance DNS
 
-ec2-13-38-36-178.eu-west-3.compute.amazonaws.com
+ec2-35-181-229-140.eu-west-3.compute.amazonaws.com
 
 ## Connect to machine through ssh
 
 ```bash
-ssh -i "aws-flask-gpt-api.pem" ec2-user@ec2-13-38-36-178.eu-west-3.compute.amazonaws.com
+ssh -i "aws-flask-gpt-api.pem" ec2-user@ec2-35-181-229-140.eu-west-3.compute.amazonaws.com
 ```
