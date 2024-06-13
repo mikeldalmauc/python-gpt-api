@@ -1,4 +1,5 @@
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge">
@@ -11,7 +12,7 @@
   <meta property="og:type" content="website">
 
   <!-- TODO cambiar miniatura al final del proy  ¿En que contexto sirve ver la steve?-->
-  <meta property="og:image" content="assets/miniaturaPH.jpg"> 
+  <meta property="og:image" content="assets/miniaturaPH.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -22,7 +23,7 @@
   <meta itemprop="description" content="Character GPT chat testing webpage">
   <meta name="author" content="Mikel Dalmau">
 
-  <script src="main.js"></script> 
+  <script src="main.js"></script>
   <!-- <script src="main.min.js"></script> -->
   <title>Mikel Dalmau</title>
 
@@ -69,36 +70,35 @@
     });
 
     app.ports.send.subscribe(message => {
-    console.info("send", message);
+      console.info("send", message);
+      switch (message?.tag) {
+        case "deleteToken":
+          tokenStorage.deleteToken();
+          break;
 
-    switch (message?.tag) {
-      case "deleteToken":
-        tokenStorage.deleteToken();
-        break;
+        case "saveToken":
+          tokenStorage.setToken(message.value);
+          break;
 
-      case "saveToken":
-        tokenStorage.setToken(message.value);
-        break;
+        case "logError":
+          console.error(message.value);
+          break;
 
-      case "logError":
-        console.error(message.value);
-        break;
-
-      default:
-        console.error("Received an unexpected message", message);
-    }
-  });
+        default:
+          console.error("Received an unexpected message", message);
+      }
+    });
 
     document.addEventListener("wheel", (ev) => {
-      if(!ev.ctrlKey){
+      if (!ev.ctrlKey) {
         app.ports.onWheel.send(ev);
       }
     });
 
-    window.addEventListener("orientationchange", function() {
+    window.addEventListener("orientationchange", function () {
       location.reload();
     });
 
-  </script> 
+  </script>
 
 </body>

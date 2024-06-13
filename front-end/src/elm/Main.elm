@@ -18,10 +18,11 @@ import Keyboard.Event exposing (KeyboardEvent, decodeKeyboardEvent)
 import Keyboard.Key as Key
 
 import String exposing (fromFloat, fromInt)
-import Json.Decode as Decode exposing (Decoder, Value)
+import Json.Decode as JD
 import Time
 import Url exposing (Url)
 import Task
+import Port.Outgoing
 
 import Data.Route as Route exposing (Route)
 import Page.Home as HomePage
@@ -34,15 +35,39 @@ import Data.Token exposing (Token)
 import Data.User exposing (User)
 import Data.Username exposing (Username)
 import Data.Viewer as Viewer exposing (Viewer)
+import Data.Config as Config
+
+
+main : Program Flags Model Msg
+main =
+    B.application
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        , onUrlRequest = ClickedLink
+        , onUrlChange = ChangedUrl
+        }
+
+
+-- FLAGS
+
+
+type alias Flags =
+    JD.Value
+
+
+
+-- MODEL
+
 
 type alias Model =
 
     { device : Device
-    , dimensions : Flags
+    , dimensions : Dimensions
     , wheelModel : WheelModel
     , gesture : Swipe.Gesture
     , prevKeyboardEvent : Maybe KeyboardEvent
-
     , userModel : UserModel
     }
 
@@ -51,7 +76,7 @@ type alias WheelModel =
     , deltaY : Float
     }
 
-type alias Flags =
+type alias Dimensions =
     { width : Int
     , height : Int
     }
@@ -69,8 +94,7 @@ type alias LoadingUserModel =
     }
 
 type alias SuccessModel =
-    { 
-      apiUrl : Url
+    { apiUrl : Url
     , url : Url
     , key : BN.Key
     , zone : Time.Zone
@@ -84,22 +108,196 @@ type Error
 
 type Page
     = Login LoginPage.Model
+    | Home HomePage.Model
     | NotAuthorized
     | NotFound
+
+
+init : Flags -> Url -> BN.Key -> ( Model, Cmd Msg )
+init flags url key =
+    case JD.decodeValue Config.decoder flags of
+        Ok {  width
+            , height
+            , apiUrl
+            , resultMaybeToken } ->
+            let
+                model =   
+                    { device = Element.classifyDevice {width=width, height=height}
+                    , dimensions = {width=width, height=height}
+                    , wheelModel = initWheelModel
+                    , gesture = Swipe.blanco
+                    , prevKeyboardEvent = Nothing
+                    , userModel =  Failure BadConfig
+                    }
+            in
+                case resultMaybeToken of
+                    Ok (Just token) ->
+                        initLoadingUser model 
+                            { apiUrl = apiUrl
+                            , url = url
+                            , key = key
+                            , token = token
+                            }
+
+                    Ok Nothing ->
+                        initSuccess model
+                            { apiUrl = apiUrl
+                            , url = url
+                            , key = key
+                            , maybeZone = Nothing
+                            , viewer = Viewer.Guest
+                            }
+                        
+
+                    Err (Config.BadToken error) ->
+                        initSuccess model
+                            { apiUrl = apiUrl
+                            , url = url
+                            , key = key
+                            , maybeZone = Nothing
+                            , viewer = Viewer.Guest
+                            }
+                            |> Tuple.mapSecond
+                                (\cmd ->
+                                    Cmd.batch
+                                        [ Port.Outgoing.logError ("Bad token: " ++ JD.errorToString error)
+                                        , cmd
+                                        ]
+                                )
+        Err error ->
+            (
+                { device = Element.classifyDevice {width=600, height=1200}
+                , dimensions = {width=600, height=1200}
+                , wheelModel = initWheelModel
+                , gesture = Swipe.blanco
+                , prevKeyboardEvent = Nothing
+                , userModel = Failure BadConfig
+                }
+            , Port.Outgoing.logError ("Configuration error: " ++ JD.errorToString error)
+            )
+
+initLoadingUser : Model ->  
+    { apiUrl : Url
+    , url : Url
+    , key : BN.Key
+    , token : Token
+    }
+    -> ( Model, Cmd Msg )
+initLoadingUser model { apiUrl, url, key, token } =
+    ( { model | userModel = 
+                                LoadingUser
+                                    { apiUrl = apiUrl
+                                    , url = url
+                                    , key = key
+                                    , zone = Time.utc
+                                    }
+                            }
+    , Cmd.batch
+        [ getZone
+        , GetUser.getUser
+            apiUrl
+            { token = token
+            , onResponse = GotUserResponse
+            }
+        ]
+    )
+
+initSuccess :
+    Model -> 
+    { apiUrl : Url
+    , url : Url
+    , key : BN.Key
+    , maybeZone : Maybe Time.Zone
+    , viewer : Viewer
+    }
+    -> ( Model, Cmd Msg )
+initSuccess model { apiUrl, url, key, maybeZone, viewer } =
+    let
+        ( zone, zoneCmd ) =
+            case maybeZone of
+                Nothing ->
+                    ( Time.utc, getZone )
+
+                Just givenZone ->
+                    ( givenZone, Cmd.none )
+
+        ( page, pageCmd ) =
+            getPageFromUrl apiUrl key viewer Nothing url
+    in
+    ( {model | userModel = 
+        Success
+        { apiUrl = apiUrl
+        , url = url
+        , key = key
+        , zone = zone
+        , viewer = viewer
+        , page = page
+        , reloadPage = True
+        , maybeArticle = Nothing
+        }
+     }
+    , Cmd.batch
+        [ zoneCmd
+        , pageCmd
+        ]
+    )
+
+initWheelModel : WheelModel
+initWheelModel = 
+    { deltaX = 0, deltaY = 0 }
+    
+
+
+getZone : Cmd Msg
+getZone =
+    Task.perform GotZone Time.here
+
+
+getPageFromUrl : Url -> BN.Key -> Viewer -> Url -> ( Page, Cmd Msg )
+getPageFromUrl apiUrl key viewer url =
+    case Route.fromUrl url of
+        Just route ->
+            getPageFromRoute apiUrl key viewer route
+
+        Nothing ->
+            ( NotFound, Cmd.none )
+
+getPageFromRoute : Url -> BN.Key -> Viewer -> Route -> ( Page, Cmd Msg )
+getPageFromRoute apiUrl key viewer route =
+    case route of
+        Route.Home ->
+            HomePage.init
+                { apiUrl = apiUrl
+                , viewer = viewer
+                , onChange = ChangedPage << ChangedHomePage
+                }
+                |> Tuple.mapFirst Home
+
+        Route.Login ->
+            withGuestForPage
+                (always
+                    (LoginPage.init
+                        { onChange = ChangedPage << ChangedLoginPage }
+                        |> Tuple.mapFirst Login
+                    )
+                )
+                key
+                viewer
+
+
+-- UPDATE
 
 type Msg =
       Wheel WheelModel
     | Swipe Swipe.Event
     | SwipeEnd Swipe.Event
-    | DeviceClassified Flags
+    | DeviceClassified Dimensions
     | HandleKeyboardEvent KeyboardEvent
     | GotZone Time.Zone
-
     | ClickedLink B.UrlRequest
     | ChangedUrl Url
     | ChangedRoute Route
     | ChangedPage PageMsg
-
     | GotUserResponse (Result (Api.Error ()) User)
     | LoggedIn User
     | LoggedOut
@@ -109,23 +307,7 @@ type PageMsg
     = ChangedHomePage HomePage.Msg
     | ChangedLoginPage LoginPage.Msg
 
-init : Flags -> Url -> BN.Key -> ( Model, Cmd Msg )
-init flags =
-    (   {   
-          device = Element.classifyDevice flags
-        , dimensions = flags
-        , wheelModel = initWheelModel
-        , gesture = Swipe.blanco
-        , prevKeyboardEvent = Nothing
-        }
-    , Cmd.none
-    )
 
-initWheelModel : WheelModel
-initWheelModel = 
-    { deltaX = 0, deltaY = 0 }
-    
-    
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -294,112 +476,3 @@ subscriptions model =
             (\width height ->
                 DeviceClassified { width = width, height = height })
         ]
-
-initLoadingUser :
-    { apiUrl : Url
-    , url : Url
-    , key : BN.Key
-    , token : Token
-    }
-    -> ( Model, Cmd Msg )
-initLoadingUser { apiUrl, url, key, token } =
-    ( LoadingUser
-        { apiUrl = apiUrl
-        , url = url
-        , key = key
-        , zone = Time.utc
-        }
-    , Cmd.batch
-        [ getZone
-        , GetUser.getUser
-            apiUrl
-            { token = token
-            , onResponse = GotUserResponse
-            }
-        ]
-    )
-
-
-initSuccess :
-    { apiUrl : Url
-    , url : Url
-    , key : BN.Key
-    , maybeZone : Maybe Time.Zone
-    , viewer : Viewer
-    }
-    -> ( Model, Cmd Msg )
-initSuccess { apiUrl, url, key, maybeZone, viewer } =
-    let
-        ( zone, zoneCmd ) =
-            case maybeZone of
-                Nothing ->
-                    ( Time.utc, getZone )
-
-                Just givenZone ->
-                    ( givenZone, Cmd.none )
-
-        ( page, pageCmd ) =
-            getPageFromUrl apiUrl key viewer Nothing url
-    in
-    ( Success
-        { apiUrl = apiUrl
-        , url = url
-        , key = key
-        , zone = zone
-        , viewer = viewer
-        , page = page
-        , reloadPage = True
-        , maybeArticle = Nothing
-        }
-    , Cmd.batch
-        [ zoneCmd
-        , pageCmd
-        ]
-    )
-
-
-getZone : Cmd Msg
-getZone =
-    Task.perform GotZone Time.here
-
-
-getPageFromUrl : Url -> BN.Key -> Viewer -> Url -> ( Page, Cmd Msg )
-getPageFromUrl apiUrl key viewer url =
-    case Route.fromUrl url of
-        Just route ->
-            getPageFromRoute apiUrl key viewer route
-
-        Nothing ->
-            ( NotFound, Cmd.none )
-
-getPageFromRoute : Url -> BN.Key -> Viewer -> Route -> ( Page, Cmd Msg )
-getPageFromRoute apiUrl key viewer maybeArticle route =
-    case route of
-        Route.Home ->
-            HomePage.init
-                { apiUrl = apiUrl
-                , viewer = viewer
-                , onChange = ChangedPage << ChangedHomePage
-                }
-                |> Tuple.mapFirst Home
-
-        Route.Login ->
-            withGuestForPage
-                (always
-                    (LoginPage.init
-                        { onChange = ChangedPage << ChangedLoginPage }
-                        |> Tuple.mapFirst Login
-                    )
-                )
-                key
-                viewer
-
-
-main : Program Flags Model Msg
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
