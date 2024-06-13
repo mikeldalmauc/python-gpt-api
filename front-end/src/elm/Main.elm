@@ -654,7 +654,7 @@ viewSuccessPage { zone, viewer, page } =
 
 
 viewFailurePage : Error -> B.Document msg
-viewFailurePage BadConfig =
+viewFailurePage badConfig =
     ErrorPage.view
         { title = "Configuration Error"
         , message = "Please check your configuration. You can view the logs to diagnose and fix the specific problem."
