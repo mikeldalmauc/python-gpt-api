@@ -159,7 +159,7 @@ oneMinute =
 buildUrl : Url -> List String -> List UB.QueryParameter -> List (Maybe UB.QueryParameter) -> String
 buildUrl baseUrl pathSegments requiredParameters optionalParameters =
     UB.crossOrigin
-        (Url.toString baseUrl)
+        (String.dropRight 1 (Url.toString baseUrl))
         pathSegments
         (requiredParameters ++ List.filterMap identity optionalParameters)
 

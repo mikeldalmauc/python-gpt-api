@@ -9,76 +9,151 @@ import Html
 import Html.Events exposing (onClick)
 import Element.Font exposing (Font)
 import Element.Font as Font
+import Url exposing (Url)
+import Data.User exposing (User)
+import Api
+import Api.Login as Login
+import Lib.Validation as V
+import Data.Validation as V
+import Browser as B
+
+import Data.Email exposing (Email)
+import Data.Password exposing (Password)
+import Lib.Task as Task
+
+import View.Column as Column
+import View.Layout as Layout
+import View.Login as Login
+import View.Navigation as Navigation
+import Html as H
 
 
 type alias Model =
     { email : String
     , password : String
-    , errorMessage : String
+    , errorMessages : List String
+    , isDisabled : Bool
     }
 
-init : Model
-init =
+type alias InitOptions msg =
+    { onChange : Msg -> msg
+    }
+
+init : InitOptions msg -> ( Model, Cmd msg )
+init { onChange } =
+    ( initModel
+    , Cmd.none
+    )
+
+
+initModel : Model
+initModel =
     { email = ""
     , password = ""
-    , errorMessage = "" }
+    , errorMessages = []
+    , isDisabled = False
+    }
+
 
 -- UPDATE
 
+type alias UpdateOptions msg =
+    { apiUrl : Url
+    , onLoggedIn : User -> msg
+    , onChange : Msg -> msg
+    }
+
+
 type Msg
-    = UpdateEmail String
-    | UpdatePassword String
-    | Submit
+    = ChangedEmail String
+    | ChangedPassword String
+    | SubmittedForm
+    | GotLoginResponse (Result (Api.Error (List String)) User)
 
-update : Msg -> Model -> Model
-update msg model =
+
+update : UpdateOptions msg -> Msg -> Model -> ( Model, Cmd msg )
+update options msg model =
     case msg of
-        UpdateEmail email ->
-            { model | email = email }
+        ChangedEmail email ->
+            ({ model | email = email }, Cmd.none)
 
-        UpdatePassword password ->
-            { model | password = password }
+        ChangedPassword password ->
+            ({ model | password = password }, Cmd.none)
 
-        Submit ->
-            if model.email == "admin" && model.password == "password" then
-                { model | errorMessage = "Login successful!" }
-            else
-                { model | errorMessage = "Invalid email or password." }
+        SubmittedForm ->
+            validate model
+                |> V.withValidation
+                    { onSuccess =
+                        \{ email, password } ->
+                            ( { model | errorMessages = [], isDisabled = True }
+                            , Login.login
+                                options.apiUrl
+                                { email = email
+                                , password = password
+                                , onResponse = GotLoginResponse
+                                }
+                                |> Cmd.map options.onChange
+                            )
+                    , onFailure =
+                        \errorMessages ->
+                            ( { model | errorMessages = errorMessages }
+                            , Cmd.none
+                            )
+                    }
+
+        GotLoginResponse result ->
+            Api.handleFormResponse
+                (\user ->
+                    ( initModel
+                    , Task.dispatch (options.onLoggedIn user)
+                    )
+                )
+                model
+                result
+
+
+type alias ValidatedFields =
+    { email : Email
+    , password : Password
+    }
+
+
+validate : Model -> V.Validation ValidatedFields
+validate { email, password } =
+    V.succeed ValidatedFields
+        |> V.apply (V.email email)
+        |> V.apply (V.password password)
+
 
 -- VIEW
 
-view : Model -> Element Msg
-view model =
-    el
-        [ width fill, height fill, Background.color (rgb 0.9 0.9 0.9) ]
-        (column
-            [ spacing 20, centerX, centerY ]
-            [ el [ Border.rounded 5, Border.width 2, Border.color (rgb 0.2 0.2 0.7), padding 20, Background.color (rgb 0.95 0.95 1) ]
-                (column
-                    [ spacing 10 ]
-                    [ text "Login"
-                    , Input.email []
-                        { onChange = UpdateEmail
-                        , text = model.email
-                        , placeholder  = Nothing
-                        , label = Input.labelLeft [] (text "Email")
-                        }
+type alias ViewOptions msg =
+    { onChange : Msg -> msg
+    }
 
-                    , Input.currentPassword []
-                        { onChange = UpdatePassword
-                        , text = model.password
-                        , placeholder  = Nothing
-                        , label = Input.labelLeft [] (text "Password")
-                        , show = False
+view : ViewOptions msg -> Model -> B.Document msg
+view { onChange } { email, password, errorMessages, isDisabled } =
+    { title = "Login"
+    , body =
+        [ Layout.view
+            { name = "auth"
+            , role = Navigation.login
+            , maybeHeader = Nothing
+            }
+            [ Column.viewSingle Column.ExtraSmall
+                [ Login.view
+                    { form =
+                        { email = email
+                        , password = password
+                        , isDisabled = isDisabled
+                        , onInputEmail = ChangedEmail
+                        , onInputPassword = ChangedPassword
+                        , onSubmit = SubmittedForm
                         }
-
-                    , Input.button [ Background.color (rgb 0.2 0.2 0.7), Element.focused [Background.color (rgb 0.1 0.1 0.5)]]
-                            { onPress = Just Submit
-                            , label = text "Login"
-                            }
-                    , text model.errorMessage
-                    ]
-                )
+                    , errorMessages = errorMessages
+                    }
+                ]
             ]
-        )
-
+            |> H.map onChange
+        ]
+    }

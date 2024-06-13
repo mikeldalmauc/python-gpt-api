@@ -4,10 +4,13 @@ import Data.Token as Token exposing (Token)
 import Json.Decode as JD
 import Lib.Json.Decode as JD
 import Url exposing (Url)
+import Html.Attributes exposing (height)
 
 
 type alias Config =
-    { apiUrl : Url
+    { width : Int
+    , height : Int
+    , apiUrl : Url
     , resultMaybeToken : Result BadToken (Maybe Token)
     }
 
@@ -18,7 +21,9 @@ type BadToken
 
 decoder : JD.Decoder Config
 decoder =
-    JD.map2 Config
+    JD.map4 Config
+        (JD.field "width" JD.int)
+        (JD.field "height" JD.int)
         (JD.field "apiUrl" JD.url)
         (JD.field "maybeToken" tokenDecoder)
 

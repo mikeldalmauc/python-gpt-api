@@ -89,15 +89,15 @@
       }
     });
 
-    document.addEventListener("wheel", (ev) => {
-      if (!ev.ctrlKey) {
-        app.ports.onWheel.send(ev);
-      }
-    });
+    // document.addEventListener("wheel", (ev) => {
+    //   if (!ev.ctrlKey) {
+    //     app.ports.onWheel.send(ev);
+    //   }
+    // });
 
-    window.addEventListener("orientationchange", function () {
-      location.reload();
-    });
+    // window.addEventListener("orientationchange", function () {
+    //   location.reload();
+    // });
 
   </script>
 

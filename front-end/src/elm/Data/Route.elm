@@ -4,6 +4,8 @@ module Data.Route exposing
     , logoutPath
     , pushUrl
     , toString
+    , redirectToLogin
+    , redirectToHome
     )
 
 import Browser.Navigation as BN
@@ -40,6 +42,9 @@ redirectToHome : BN.Key -> Cmd msg
 redirectToHome key =
     replaceUrl key Home
 
+redirectToLogin : BN.Key -> Cmd msg
+redirectToLogin key =
+    replaceUrl key Login
 
 replaceUrl : BN.Key -> Route -> Cmd msg
 replaceUrl key =

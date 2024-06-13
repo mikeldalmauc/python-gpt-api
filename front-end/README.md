@@ -1,6 +1,7 @@
 - [Install](#install)
 - [Build the source code](#build-the-source-code)
 - [Build the elm code](#build-the-elm-code)
+- [Elm code reference](#elm-code-reference)
 
 
 ## Install
@@ -32,3 +33,7 @@ This command will run a live server and compile elm on changes.
 The gulp task will run the following command to build the Elm code.
 
 ```elm make src/Main.elm --output build/main.js```
+
+## Elm code reference
+
+https://github.com/dwayne/elm-conduit
