@@ -4,6 +4,8 @@ from flask_cors import CORS
 from util.common import chatGptApiKey, redisPassword, domain, port, prefix, protocol, build_swagger_config_json
 from resources.swaggerConfig import SwaggerConfig
 from resources.bookResource import BooksGETResource, BookGETResource, BookPOSTResource, BookPUTResource, BookDELETEResource
+from resources.login import LoginResource
+
 from flask_swagger_ui import get_swaggerui_blueprint
 
 # ============================================
@@ -14,6 +16,12 @@ app = application
 app.config['PROPAGATE_EXCEPTIONS'] = True
 CORS(app)
 api = Api(app, prefix=prefix, catch_all_404s=True)
+
+# Configuración de JWTManager
+jwt = JWTManager(app)  
+
+# Configurar Redis
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
 # ============================================
 # Swagger
@@ -71,7 +79,8 @@ api.add_resource(BookPUTResource, '/books/<int:id>')
 # DELETE book
 api.add_resource(BookDELETEResource, '/books/<int:id>')
 
-
+# Añadir recurso de inicio de sesión
+api.add_resource(LoginResource, '/login', resource_class_args=(redis_client,))
 
 if __name__ == '__main__':
     app.run(debug=True)
