@@ -1,5 +1,7 @@
 aws-flask-gpt-api.pem
 certs
+.env
+production/.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
