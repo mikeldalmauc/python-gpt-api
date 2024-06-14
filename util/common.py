@@ -11,6 +11,8 @@ class ENVIRONMENT:
         self.port = os.getenv("PORT")
         self.prefix = os.getenv("PREFIX")
         self.protocol = os.getenv("PROTOCOL")
+        self.chatGptApiKey = os.getenv("CHAT_GPT_API_KEY")
+        self.redisPassword = os.getenv("REDIS_PASSWORD")
 
     def get_instance(self):
         if not hasattr(self, "_instance"):
@@ -29,11 +31,18 @@ class ENVIRONMENT:
     def getProtocol(self):
         return self.protocol
 
+    def getRedisPassword(self):
+        return self.redisPassword
+
+    def getGptApiKet(self):
+        return self.chatGptApiKey
 
 domain = ENVIRONMENT().get_instance().getDomain()
 port = ENVIRONMENT().get_instance().getPort()
 prefix = ENVIRONMENT().get_instance().getPrefix()
 protocol = ENVIRONMENT().get_instance().getProtocol()
+chatGptApiKey = ENVIRONMENT().get_instance().getGptApiKet()
+redisPassword = ENVIRONMENT().get_instance().getRedisPassword()
 
 def build_swagger_config_json():
     config_file_path = 'static/swagger/config.json'
