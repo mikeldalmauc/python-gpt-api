@@ -2,9 +2,10 @@
 import redis from 'redis';
 import { redisPassword, redisHost } from '../config/config.mjs';
 
+console.log(redisHost);
+
 const redisClient = redis.createClient({
-    host: redisHost,
-    port: 6379,
+    url: `redis://${redisHost}:6379`,
     password: redisPassword,
 });
 

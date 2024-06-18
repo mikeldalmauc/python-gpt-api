@@ -1,4 +1,4 @@
-// File: app.mjs
+
 import express from 'express';
 import session from 'express-session';
 import passport from 'passport';
@@ -6,11 +6,12 @@ import bodyParser from 'body-parser';
 import RedisStore  from 'connect-redis';
 import path from 'path';
 import morgan from 'morgan';
+import { fileURLToPath } from 'url';
+
 import redisClient from './middlewares/redisClient.mjs';
 import { initAdminUser } from './utils/userInit.mjs';
 import { sessionSecret, port } from './config/config.mjs';
 import authRoutes from './routes/auth.mjs';
-import { fileURLToPath } from 'url';
 
 // __dirname polyfill for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -18,14 +19,6 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Express app
 const app = express();
-
-// Session middleware
-app.use(session({
-    store: new RedisStore({ client: redisClient }),
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-}));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

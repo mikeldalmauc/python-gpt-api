@@ -1,5 +1,6 @@
 {
-    "watch": ["app.mjs", "routes/", "models/", "middlewares/"],
-    "ext": "js,json,mjs",
-    "exec": "node app.mjs"
-  }
+  "watch": ["src"],
+  "ext": "js,mjs,json",
+  "ignore": ["dist"],
+  "exec": "node src/app.mjs"
+}
