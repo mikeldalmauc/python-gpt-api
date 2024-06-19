@@ -1,17 +1,15 @@
 
 import express from 'express';
 import session from 'express-session';
-import passport from 'passport';
-import bodyParser from 'body-parser';
 import RedisStore  from 'connect-redis';
 import path from 'path';
-import morgan from 'morgan';
 import { fileURLToPath } from 'url';
 
 import redisClient from './middlewares/redisClient.mjs';
-import { initAdminUser } from './utils/userInit.mjs';
-import { sessionSecret, port } from './config/config.mjs';
-import authRoutes from './routes/auth.mjs';
+import { sessionSecret, port, prefix } from './config/config.mjs';
+import authenticateToken from './middlewares/jwtVerifier.mjs';
+import { initializeUser, initAdminUser, loginUser } from './repository/mongo/userRepo.mjs'; // adjust the path as necessary
+
 
 // __dirname polyfill for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -20,11 +18,15 @@ const __dirname = path.dirname(__filename);
 // Initialize Express app
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(morgan('dev')); // Logging middleware
+app.use(session({
+  store: new RedisStore({ client: redisClient }),
+  secret: sessionSecret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: true } // Set to true if using HTTPS
+}));
+
+app.use(express.json());
 
 // Configure template engine
 app.set('view engine', 'ejs');
@@ -33,16 +35,63 @@ console.log('Template engine configured');
 
 // Routes
 
-app.use('/auth', authRoutes);
-//app.use('/api', apiRoutes);
-
 app.get('/', (req, res) => res.render('home'));
 //app.get('/chat', (req, res) => res.render('chat'));
-
-app.listen(port, () => console.log(`Server running on port ${port}`));
-
-redisClient.connect();
-
+// Authenticated routes
+// Initialize admin user
 initAdminUser();
+
+// Login route
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const { jwt, user } = await loginUser(email, password);
+    req.session.jwt = jwt;
+    res.json({ message: 'Login successful', user });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.get('/profile', authenticateToken, (req, res) => {
+    res.send(`Hello ${req.user.email}, your role is ${req.user.role}`);
+});
+  
+// Example of setting session data
+app.get('/setSessionData', authenticateToken, function(req, res) {
+    req.session.username = 'John Doe';
+    res.send('Session data set successfully!');
+});
+  
+// Example of getting session data
+app.get('/getSessionData', authenticateToken, function(req, res) {
+    res.send('Username: ' + req.session.username);
+});
+
+// START SERVER allow restart 
+let server;
+function startServer() {
+  server = app.listen(port, () => console.log(`Server running on port ${port}`));
+
+  // Handle server shutdown gracefully
+  process.on('SIGTERM', () => {
+    if (server) {
+      server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+      });
+    }
+  });
+
+  process.on('SIGINT', () => {
+    if (server) {
+      server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+      });
+    }
+  });
+}
+startServer();
 
 export { app };

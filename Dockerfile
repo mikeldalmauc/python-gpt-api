@@ -1,4 +1,6 @@
-FROM node:14
+FROM node:latest
+
+COPY ./app /app
 
 # Establece el directorio de trabajo en /app
 WORKDIR /app

@@ -1,69 +1,112 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-// Crear el modelo de usuario
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+  role: String,
+  conversationHistory: Array
+});
+
 const User = mongoose.model('User', userSchema);
 
-// Función para inicializar un usuario
-async function initializeUser(name, email, password) {
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({
-            name: name,
-            email: email,
-            password: hashedPassword,
-            conversationHistory: []
-        });
-        await newUser.save();
-        console.log('Usuario creado exitosamente');
-    } catch (error) {
-        console.error('Error al crear el usuario:', error);
-    }
+async function initializeUser(name, email, password, role = 'user') {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      conversationHistory: []
+    });
+
+    await newUser.save();
+
+    await redisClient.set(email, JSON.stringify(newUser), (err, res) => {
+      if (err) {
+        console.error('Error initializing user in Redis:', err);
+      } else {
+        console.log('User initialized in Redis:', res);
+      }
+    });
+
+    console.log('User created successfully');
+  } catch (error) {
+    console.error('Error creating user:', error);
+  }
 }
 
-// Función para eliminar un usuario
+async function initAdminUser() {
+  try {
+    const adminExists = await User.findOne({ role: 'admin' });
+    if (!adminExists) {
+      await initializeUser('Admin', 'admin@example.com', 'adminpass', 'admin');
+      console.log('Admin user initialized');
+    } else {
+      console.log('Admin user already exists');
+    }
+  } catch (error) {
+    console.error('Error initializing admin user:', error);
+  }
+}
+
 async function deleteUser(email) {
-    try {
-        await User.findOneAndDelete({ email: email });
-        console.log('Usuario eliminado exitosamente');
-    } catch (error) {
-        console.error('Error al eliminar el usuario:', error);
-    }
+  try {
+    await User.findOneAndDelete({ email });
+    console.log('User deleted successfully');
+  } catch (error) {
+    console.error('Error deleting user:', error);
+  }
 }
 
-// Función para leer los datos de un usuario
 async function readUser(email) {
-    try {
-        const user = await User.findOne({ email: email });
-        if (user) {
-            console.log('Datos del usuario:', user);
-        } else {
-            console.log('Usuario no encontrado');
-        }
-    } catch (error) {
-        console.error('Error al leer el usuario:', error);
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      console.log('User data:', user);
+      return user;
+    } else {
+      console.log('User not found');
     }
+  } catch (error) {
+    console.error('Error reading user:', error);
+  }
 }
 
-// Función para actualizar los datos de un usuario
 async function updateUser(email, updatedData) {
-    try {
-        const user = await User.findOneAndUpdate({ email: email }, updatedData, { new: true });
-        if (user) {
-            console.log('Usuario actualizado exitosamente:', user);
-        } else {
-            console.log('Usuario no encontrado');
-        }
-    } catch (error) {
-        console.error('Error al actualizar el usuario:', error);
+  try {
+    const user = await User.findOneAndUpdate({ email }, updatedData, { new: true });
+    if (user) {
+      console.log('User updated successfully:', user);
+      return user;
+    } else {
+      console.log('User not found');
     }
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
 }
 
-// Ejemplo de uso
-(async () => {
-    await initializeUser('John Doe', 'john@example.com', 'password123');
-    await readUser('john@example.com');
-    await updateUser('john@example.com', { name: 'Johnathan Doe' });
-    await deleteUser('john@example.com');
-    mongoose.connection.close();
-})();
+async function loginUser(email, password) {
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Invalid password');
+    }
+
+    const jwtToken = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    return { jwt: jwtToken, user };
+  } catch (error) {
+    console.error('Error logging in:', error);
+    throw error;
+  }
+}
+
+export { initializeUser, initAdminUser, deleteUser, readUser, updateUser, loginUser };
