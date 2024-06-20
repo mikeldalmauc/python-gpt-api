@@ -12,15 +12,15 @@ const {
     MONGODB_DOCKER_PORT,
     MONGODB_DATABASE,
     MONGODB_TEST_DATABASE,
-    PREFIX
+    MONGODB_HOST
 } = process.env;
 
 export const prefix = process.env.PREFIX;
 export const redisPassword = process.env.REDIS_PASSWORD;
 export const redisHost = process.env.REDIS_HOST;
 export const jwtSecret = process.env.JWT_SECRET;
-export const mongoUri = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${DOMAIN}:${MONGODB_DOCKER_PORT}/${MONGODB_DATABASE}`;
+export const mongoUri = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGODB_HOST}:${MONGODB_DOCKER_PORT}/${MONGODB_DATABASE}`;
 export const sessionSecret = process.env.SESSION_SECRET;
 export const adminPass = process.env.ADMIN_PASS;
 export const port = process.env.PORT || 3000;
-export const mongoTestUri = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${DOMAIN}:${MONGODB_DOCKER_PORT}/${MONGODB_TEST_DATABASE}`;
+export const mongoTestUri = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@${MONGODB_HOST}:${MONGODB_DOCKER_PORT}/${MONGODB_TEST_DATABASE}`;

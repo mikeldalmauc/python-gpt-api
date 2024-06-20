@@ -24,14 +24,6 @@ async function initializeUser(name, email, password, role = 'user') {
 
     await newUser.save();
 
-    await redisClient.set(email, JSON.stringify(newUser), (err, res) => {
-      if (err) {
-        console.error('Error initializing user in Redis:', err);
-      } else {
-        console.log('User initialized in Redis:', res);
-      }
-    });
-
     console.log('User created successfully');
   } catch (error) {
     console.error('Error creating user:', error);

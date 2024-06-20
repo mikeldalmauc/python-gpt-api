@@ -2,13 +2,16 @@ import mongoose from 'mongoose';
 import { mongoUri } from '../config/config.mjs';
 
 // Connect to MongoDB
-mongoose.connect(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log('Connected to MongoDB');
-}).catch(err => {
-    console.error('Error connecting to MongoDB', err);
-});
+const connectDB = async () => {
+    try {
+        console.log(mongoUri+"?authSource=admin");
+        await mongoose.connect(mongoUri+"?authSource=admin", {
+        });
+        console.log('Database is connected');
+    } catch (err) {
+        console.error('Error connecting to the database:', err);
+        process.exit(1);
+    }
+};
 
-export default connectToMongoDB;
+export default connectDB;
