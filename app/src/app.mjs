@@ -5,12 +5,11 @@ import RedisStore  from 'connect-redis';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import redisClient from './middlewares/redisClient.mjs';
+import {redisClient, redisSession} from './middlewares/redisClient.mjs';
 import connectDB from './middlewares/mongoClient.mjs';
 import { sessionSecret, port, prefix } from './config/config.mjs';
 import authenticateToken from './middlewares/jwtVerifier.mjs';
 import { initializeUser, initAdminUser, loginUser } from './repository/mongo/userRepo.mjs'; // adjust the path as necessary
-
 
 // __dirname polyfill for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -18,16 +17,15 @@ const __dirname = path.dirname(__filename);
 
 // Initialize Express app
 const app = express();
+
+// Middleware to parse URL-encoded bodies (from HTML forms)
+app.use(express.urlencoded({ extended: true })); // Or use body-parser: app.use(bodyParser.urlencoded({ extended: true }));
+
+// Middleware to parse JSON bodies
 app.use(express.json());
 
 // Redis client should be started for session form middleware
-app.use(session({
-  store: new RedisStore({ client: redisClient }),
-  secret: sessionSecret,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: true } // Set to true if using HTTPS
-}));
+let rsapp = "myapp";
 
 // Connect mongo client
 connectDB();
@@ -37,7 +35,7 @@ initAdminUser();
 
 // Configure template engine
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '../views'));
+app.set('views', path.join(__dirname, 'views'));
 console.log('Template engine configured');
 
 // Routes
@@ -48,11 +46,30 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const { jwt, user } = await loginUser(email, password);
-    req.session.jwt = jwt;
+    res.redirect('/dashboard');
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// API Login route
+app.post(prefix+'/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const { jwt, user } = await loginUser(email, password);
     res.json({ message: 'Login successful', user });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
+});
+
+app.get('/dashboard', (req, res) => {
+  console.log(req.cookies);
+  console.log(req.session);
+  console.log(req.session.user);
+
+  const section = req.query.section || 'chat';
+  res.render('dashboard', { user: req.session.user, section });
 });
 
 app.get('/profile', authenticateToken, (req, res) => {
@@ -74,27 +91,23 @@ app.get('/getSessionData', authenticateToken, function(req, res) {
 
 // START SERVER allow restart 
 let server;
+
+
 function startServer() {
   server = app.listen(port, () => console.log(`Server running on port ${port}`));
+  let handleExit = () => {
+    if (server) {
+      server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+      });
+    }
+  }
 
   // Handle server shutdown gracefully
-  process.on('SIGTERM', () => {
-    if (server) {
-      server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-      });
-    }
-  });
-
-  process.on('SIGINT', () => {
-    if (server) {
-      server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-      });
-    }
-  });
+  process.on('SIGINT', handleExit);
+  process.on('SIGTERM', handleExit);
+  process.on('SIGQUIT', handleExit);
 }
 
 startServer();

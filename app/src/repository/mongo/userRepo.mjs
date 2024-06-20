@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import {appAdminEmail, appAdminPass} from '../../config/config.mjs'
+import jwt from 'jsonwebtoken';
+
 
 const userSchema = new mongoose.Schema({
   name: String,
-  email: { type: String, unique: true },
+  email:{ type: String, unique: true, required: true },
   password: String,
   role: String,
   conversationHistory: Array
@@ -34,7 +37,7 @@ async function initAdminUser() {
   try {
     const adminExists = await User.findOne({ role: 'admin' });
     if (!adminExists) {
-      await initializeUser('Admin', 'admin@example.com', 'adminpass', 'admin');
+      await initializeUser('admin', appAdminEmail, appAdminPass, 'admin');
       console.log('Admin user initialized');
     } else {
       console.log('Admin user already exists');
@@ -46,7 +49,7 @@ async function initAdminUser() {
 
 async function deleteUser(email) {
   try {
-    await User.findOneAndDelete({ email });
+    await User.findOneAndDelete({ email: email });
     console.log('User deleted successfully');
   } catch (error) {
     console.error('Error deleting user:', error);
@@ -55,7 +58,7 @@ async function deleteUser(email) {
 
 async function readUser(email) {
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email });
     if (user) {
       console.log('User data:', user);
       return user;
@@ -69,7 +72,7 @@ async function readUser(email) {
 
 async function updateUser(email, updatedData) {
   try {
-    const user = await User.findOneAndUpdate({ email }, updatedData, { new: true });
+    const user = await User.findOneAndUpdate({ email: email }, updatedData, { new: true });
     if (user) {
       console.log('User updated successfully:', user);
       return user;
@@ -83,7 +86,9 @@ async function updateUser(email, updatedData) {
 
 async function loginUser(email, password) {
   try {
-    const user = await User.findOne({ email });
+    console.log(email);
+    console.log(password);
+    const user = await User.findOne({ email: email });
     if (!user) {
       throw new Error('User not found');
     }
@@ -92,9 +97,19 @@ async function loginUser(email, password) {
       throw new Error('Invalid password');
     }
 
-    const jwtToken = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    return { jwt: jwtToken, user };
+    const resp = await rs.create({
+      app: rsapp,
+      id: email,
+      ip: "192.168.22.58",
+      ttl: 3600,
+      d: { 
+        foo: "bar",
+        unread_msgs: 34
+      }
+    });
+      
+    //const jwtToken = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return { jwt: resp.token, user };
   } catch (error) {
     console.error('Error logging in:', error);
     throw error;

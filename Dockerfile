@@ -8,6 +8,12 @@ WORKDIR /app
 #COPY ./environment/.production.env .env
 COPY ./environment/dev.env .env
 
+RUN apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    net-tools \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
 # Instala las dependencias del proyecto
 RUN npm install
 RUN npm install --save-dev nodemon

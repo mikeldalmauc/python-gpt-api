@@ -7,14 +7,14 @@
     <h1>Welcome to the Home Page</h1>
     
     <h1>Login</h1>
-    <form action="/auth/login" method="post">
+    <form action="/login" method="post">
         <div>
             <label>Username:</label>
-            <input type="text" name="username">
+            <input type="text" name="email" required>
         </div>
         <div>
             <label>Password:</label>
-            <input type="password" name="password">
+            <input type="password" name="password" required>
         </div>
         <div>
             <button type="submit">Login</button>

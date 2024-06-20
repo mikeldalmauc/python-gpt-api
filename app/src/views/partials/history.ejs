@@ -1,0 +1,25 @@
+<div class="chat-history">
+    <!-- Chat history will be dynamically loaded here -->
+</div>
+
+<script>
+    // Load chat history
+    fetch('/chat/history')
+        .then(response => response.json())
+        .then(data => {
+            const historyContainer = document.querySelector('.chat-history');
+            historyContainer.innerHTML = ''; // Clear previous history
+            data.forEach(chat => {
+                const chatElement = document.createElement('div');
+                chatElement.textContent = `Chat ID: ${chat.id}`;
+                chatElement.addEventListener('click', () => {
+                    fetch(`/chat/history/${chat.id}`)
+                        .then(response => response.json())
+                        .then(chatData => {
+                            // Display chat data
+                        });
+                });
+                historyContainer.appendChild(chatElement);
+            });
+        });
+</script>
