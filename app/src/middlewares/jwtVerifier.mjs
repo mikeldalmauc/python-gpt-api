@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
 
 const authenticateToken = (req, res, next) => {
-  const token = req.session.jwt;
+  
+  
+
   if (!token) {
     return res.status(401).send('Access Denied: No Token Provided!');
   }

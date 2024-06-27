@@ -1,0 +1,123 @@
+$primary-color: #3498db;
+$secondary-color: #2c3e50;
+$background-color: #f8f8f8;
+$text-color: #333;
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    background-color: $background-color;
+}
+
+.header {
+    width: 100%;
+    padding: 10px;
+    background-color: $background-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    .logo img {
+        height: 40px;
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+        span {
+            margin-right: 20px;
+            color: $text-color;
+        }
+        a {
+            color: $primary-color;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+.container {
+    display: flex;
+    flex-grow: 1;
+}
+
+.menu {
+    width: 200px;
+    background-color: $secondary-color;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    a {
+        padding: 15px;
+        color: white;
+        text-decoration: none;
+        border-bottom: 1px solid darken($secondary-color, 10%);
+        &:hover {
+            background-color: darken($secondary-color, 10%);
+        }
+    }
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.chat-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .chat-history {
+        flex-grow: 1;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        .message {
+            margin-bottom: 10px;
+            strong {
+                color: $primary-color;
+            }
+        }
+    }
+    .chat-input {
+        display: flex;
+        textarea {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+        }
+        button {
+            padding: 10px;
+            margin-left: 10px;
+            border: none;
+            background-color: $primary-color;
+            color: white;
+            cursor: pointer;
+            &:hover {
+                background-color: darken($primary-color, 10%);
+            }
+        }
+    }
+}
+
+.chat-history-list {
+    .chat-history-item {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        &:hover {
+            background-color: lighten($background-color, 10%);
+        }
+        .chat-preview {
+            color: darken($text-color, 20%);
+        }
+    }
+}

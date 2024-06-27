@@ -97,19 +97,8 @@ async function loginUser(email, password) {
       throw new Error('Invalid password');
     }
 
-    const resp = await rs.create({
-      app: rsapp,
-      id: email,
-      ip: "192.168.22.58",
-      ttl: 3600,
-      d: { 
-        foo: "bar",
-        unread_msgs: 34
-      }
-    });
-      
     //const jwtToken = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return { jwt: resp.token, user };
+    return { user };
   } catch (error) {
     console.error('Error logging in:', error);
     throw error;

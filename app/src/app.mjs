@@ -5,7 +5,7 @@ import RedisStore  from 'connect-redis';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import {redisClient, redisSession} from './middlewares/redisClient.mjs';
+import {redisClient} from './middlewares/redisClient.mjs';
 import connectDB from './middlewares/mongoClient.mjs';
 import { sessionSecret, port, prefix } from './config/config.mjs';
 import authenticateToken from './middlewares/jwtVerifier.mjs';
@@ -25,7 +25,17 @@ app.use(express.urlencoded({ extended: true })); // Or use body-parser: app.use(
 app.use(express.json());
 
 // Redis client should be started for session form middleware
-let rsapp = "myapp";
+// The session ID is stored as a cookie i
+// By default, the session ID is saved in a cookie with the name connect.sid. 
+// This cookie is used to identify and differentiate sessions between the server and the client.
+await redisClient.connect();
+app.use(session({
+  store: new RedisStore({ client: redisClient }),
+  secret: sessionSecret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 } // 1 hora de duración
+}));
 
 // Connect mongo client
 connectDB();
@@ -39,14 +49,26 @@ app.set('views', path.join(__dirname, 'views'));
 console.log('Template engine configured');
 
 // Routes
-app.get('/', (req, res) => res.render('home'));
+app.get('/', (req, res) => {
+  // crear nuevo objeto de sesión.
+  if(req.session.key) {
+    // el usuario ya ha iniciado sesión
+    res.redirect('/dashboard');
+  } else {
+    // no se ha encontrado ninguna sesión, vaya a la página de inicio
+    res.render("home");
+  }
+});
 
 // Login route
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const { jwt, user } = await loginUser(email, password);
-    res.redirect('/dashboard');
+    const { user } = await loginUser(email, password);
+    req.session.user = user; // Save user to session
+    req.session.save(() => {
+      res.redirect('/dashboard');
+    });    
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -56,13 +78,19 @@ app.post('/login', async (req, res) => {
 app.post(prefix+'/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const { jwt, user } = await loginUser(email, password);
-    res.json({ message: 'Login successful', user });
+    const { user } = await loginUser(email, password);
+    req.session.user = user; // Save user to session
+    req.session.save(() => {
+      res.json({ message: 'Login successful', user });
+    });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
+function saveUserToSession(req, user, callback){
+  req.session.user = user; // Save user to session
+}
 app.get('/dashboard', (req, res) => {
   console.log(req.cookies);
   console.log(req.session);
