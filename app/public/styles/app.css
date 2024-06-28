@@ -1,0 +1,116 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  height: 100vh;
+  margin: 0;
+  background-color: #f8f8f8;
+}
+
+.header {
+  width: 100%;
+  padding: 10px;
+  background-color: #f8f8f8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.header .logo img {
+  height: 40px;
+}
+.header .user-info {
+  display: flex;
+  align-items: center;
+}
+.header .user-info span {
+  margin-right: 20px;
+  color: #333;
+}
+.header .user-info a {
+  color: #3498db;
+  text-decoration: none;
+}
+.header .user-info a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  display: flex;
+  flex-grow: 1;
+}
+
+.menu {
+  width: 200px;
+  background-color: #2c3e50;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+.menu a {
+  padding: 15px;
+  color: white;
+  text-decoration: none;
+  border-bottom: 1px solid #1a252f;
+}
+.menu a:hover {
+  background-color: #1a252f;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.chat-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.chat-view .chat-history {
+  flex-grow: 1;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.chat-view .chat-history .message {
+  margin-bottom: 10px;
+}
+.chat-view .chat-history .message strong {
+  color: #3498db;
+}
+.chat-view .chat-input {
+  display: flex;
+}
+.chat-view .chat-input textarea {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none;
+}
+.chat-view .chat-input button {
+  padding: 10px;
+  margin-left: 10px;
+  border: none;
+  background-color: #3498db;
+  color: white;
+  cursor: pointer;
+}
+.chat-view .chat-input button:hover {
+  background-color: #217dbb;
+}
+
+.chat-history-list .chat-history-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.chat-history-list .chat-history-item:hover {
+  background-color: white;
+}
+.chat-history-list .chat-history-item .chat-preview {
+  color: black;
+}

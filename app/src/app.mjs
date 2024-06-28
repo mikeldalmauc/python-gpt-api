@@ -4,10 +4,10 @@ import session from 'express-session';
 import RedisStore  from 'connect-redis';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
+import * as sass from 'sass';
 import {redisClient} from './middlewares/redisClient.mjs';
 import connectDB from './middlewares/mongoClient.mjs';
-import { sessionSecret, port, prefix } from './config/config.mjs';
+import { sessionSecret, port, prefix, scssFilename, cssOutputFilename } from './config/config.mjs';
 import authenticateToken from './middlewares/jwtVerifier.mjs';
 import { initializeUser, initAdminUser, loginUser } from './repository/mongo/userRepo.mjs'; // adjust the path as necessary
 
@@ -48,6 +48,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 console.log('Template engine configured');
 
+// Serve static files from public directory
+console.log(path.join(__dirname, '..', 'public'));
+app.use(express.static(path.join(__dirname,  '..', 'public')));
+
 // Routes
 app.get('/', (req, res) => {
   // crear nuevo objeto de sesión.
@@ -56,7 +60,7 @@ app.get('/', (req, res) => {
     res.redirect('/dashboard');
   } else {
     // no se ha encontrado ninguna sesión, vaya a la página de inicio
-    res.render("home");
+    res.render("home", {title:"home"});
   }
 });
 
@@ -97,7 +101,7 @@ app.get('/dashboard', (req, res) => {
   console.log(req.session.user);
 
   const section = req.query.section || 'chat';
-  res.render('dashboard', { user: req.session.user, section });
+  res.render('dashboard', { user: req.session.user, title:"dashboard", section: section});
 });
 
 app.get('/profile', authenticateToken, (req, res) => {
