@@ -1,0 +1,119 @@
+// Define font-face for each font
+@font-face {
+    font-family: "InconsolataNerd";
+    src: url("../fonts/InconsolataNerdFont-Bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "InconsolataNerd";
+    src: url("../fonts/InconsolataNerdFont-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "InconsolataNerdMono";
+    src: url("../fonts/InconsolataNerdFontMono-Bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "InconsolataNerdMono";
+    src: url("../fonts/InconsolataNerdFontMono-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "InconsolataNerdPropo";
+    src: url("../fonts/InconsolataNerdFontPropo-Bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "InconsolataNerdPropo";
+    src: url("../fonts/InconsolataNerdFontPropo-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "ProFontIIxNerd";
+    src: url("../fonts/ProFontIIxNerdFont-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "ProFontIIxNerdMono";
+    src: url("../fonts/ProFontIIxNerdFontMono-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "ProFontIIxNerdPropo";
+    src: url("../fonts/ProFontIIxNerdFontPropo-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "ProFontWindowsNerd";
+    src: url("../fonts/ProFontWindowsNerdFont-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "ProFontWindowsNerdMono";
+    src: url("../fonts/ProFontWindowsNerdFontMono-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "ProFontWindowsNerdPropo";
+    src: url("../fonts/ProFontWindowsNerdFontPropo-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+*{
+    font-family: "InconsolataNerd", Arial, sans-serif;
+
+}
+// Apply the ../fonts to your styles
+body {
+    font-family: "InconsolataNerd", Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "ProFontWindowsNerdPropo", Arial, sans-serif;
+}
+
+label{
+    font-family: "InconsolataNerd", Arial, sans-serif;
+}
+
+p {
+    font-family: "InconsolataNerd", Arial, sans-serif;
+}
+
+input{
+    font-family: "InconsolataNerd", Arial, sans-serif;
+}
+
+.submit-button {
+    font-family: "InconsolataNerdPropo", Arial, sans-serif;
+    font-weight: bold;
+}

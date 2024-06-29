@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 import * as sass from 'sass';
 import {redisClient} from './middlewares/redisClient.mjs';
 import connectDB from './middlewares/mongoClient.mjs';
-import { sessionSecret, port, prefix, scssFilename, cssOutputFilename } from './config/config.mjs';
+import { sessionSecret, port, prefix } from './config/config.mjs';
 import authenticateToken from './middlewares/jwtVerifier.mjs';
 import { initializeUser, initAdminUser, loginUser } from './repository/mongo/userRepo.mjs'; // adjust the path as necessary
 

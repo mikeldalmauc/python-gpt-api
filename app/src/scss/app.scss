@@ -1,37 +1,148 @@
-$primary-color: #3498db;
-$secondary-color: #2c3e50;
-$background-color: #f8f8f8;
+@import 'fonts'; // Import the fonts SCSS file
+
+$primary-color: #55E000;
+$low-primary-color: #2F4422;
+$complementary-color: #9100E0;
+$second-complementary-color: #E00065;
+$low-complementary-color: #503061;
+$low-second-complementary-color: #613046;
 $text-color: #333;
+$background-color: $complementary-color;
+
+// Screen size variables
+$mobile: 576px;
+$tablet: 768px;
+$desktop: 992px;
+$large-desktop: 1200px;
 
 body {
     font-family: Arial, sans-serif;
     display: flex;
     height: 100vh;
     margin: 0;
-    background-color: $background-color;
+    background-color: $complementary-color;
+    flex-direction: column; // Default for mobile
+}
+.login-form {
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+    }
+
+    margin: auto;
+    padding: 1.25em; // 20px converted to em
+    background-color: white;
+    border-radius: 0.25em; // 4px converted to em
+    
+    box-shadow: 0.2em 0.2em 0.4em $low-complementary-color; // 2px and 4px converted to em
+    border-style: solid;
+    border-width: medium;
+    border-color: black;
+
+    
+    input {
+        
+        width: 92%;
+        padding: 0.625em; // 10px converted to em
+        margin-bottom: 0.625em; // 10px converted to em
+        border-radius: 0.25em; // 4px converted to em
+
+        border-color: black;
+        border-style: solid;
+        border-width: thin;
+
+        box-shadow: 0.05em 0.05em 0.1em $low-complementary-color; // 2px and 4px converted to em
+        
+        transition: border-color 0.3s;
+
+        &:focus {
+            border-color: $primary-color;
+            outline: none; // Remove default outline
+        }
+    }
+
+    button {
+        color: $text-color;
+        width: 96%;
+        padding: 0.625em; // 10px converted to em
+        border: none;
+        background-color: $primary-color;
+        border-radius: 0.25em; // 4px converted to em
+        cursor: pointer;
+        border-color: black;
+        border-style: solid;
+        border-width: thin;
+        box-shadow: 0.1em 0.1em 0.2em $low-complementary-color; // 2px and 4px converted to em
+        font-size: larger;
+
+        position: relative;
+        overflow: hidden;
+
+        &:hover {            
+            &:before {
+                transform: translate(-45%, -45%) rotate(45deg) scale(1);
+            }
+        }
+
+        &:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200%;
+            height: 200%;
+            background: rgb(213,232,215);
+            background: linear-gradient(0deg, rgb(197, 235, 200) 0%, rgba(210, 230, 210, 0.775) 43%, rgb(191, 230, 195) 100%);
+            filter: hue-rotate(180deg) saturate(0.5) brightness(1.01) blur(0.02em) contrast(4);
+            transform: translate(-50%, -50%) rotate(45deg) scale(0);
+            transition: transform 0.3s;
+            border-radius: inherit; // Ensure the glow effect matches the button's border-radius
+        }
+
+    }
+
+    h1 {
+        font-size: 1.5em; // Relative font size
+        margin-bottom: 0.75em; // Relative margin
+    }
+
+    label {
+        font-size: 1em; // Relative font size
+    }
+
+    form div {
+        margin-bottom: 0.75em; // Relative margin
+    }
 }
 
 .header {
     width: 100%;
-    padding: 10px;
-    background-color: $background-color;
+    padding: 0.625em; // 10px converted to em
+    background-color: $complementary-color;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.1); // 2px and 4px converted to em
+
     .logo img {
-        height: 40px;
+        height: 2.5em; // 40px converted to em
     }
+
     .user-info {
         display: flex;
         align-items: center;
+
         span {
-            margin-right: 20px;
+            margin-right: 1.25em; // 20px converted to em
             color: $text-color;
         }
+
         a {
             color: $primary-color;
             text-decoration: none;
+
             &:hover {
                 text-decoration: underline;
             }
@@ -42,28 +153,39 @@ body {
 .container {
     display: flex;
     flex-grow: 1;
+    flex-direction: column; // Default for mobile
+
+    @media (min-width: $tablet) {
+        flex-direction: row;
+    }
 }
 
 .menu {
-    width: 200px;
-    background-color: $secondary-color;
+    width: 100%;
+    background-color: $complementary-color;
     color: white;
     display: flex;
     flex-direction: column;
+
+    @media (min-width: $tablet) {
+        width: 200px;
+    }
+
     a {
-        padding: 15px;
+        padding: 0.9375em; // 15px converted to em
         color: white;
         text-decoration: none;
-        border-bottom: 1px solid darken($secondary-color, 10%);
+        border-bottom: 1px solid darken($complementary-color, 10%);
+
         &:hover {
-            background-color: darken($secondary-color, 10%);
+            background-color: darken($complementary-color, 10%);
         }
     }
 }
 
 .content {
     flex-grow: 1;
-    padding: 20px;
+    padding: 1.25em; // 20px converted to em
     overflow-y: auto;
 }
 
@@ -71,35 +193,42 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+
     .chat-history {
         flex-grow: 1;
         overflow-y: auto;
         border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 10px;
+        padding: 0.625em; // 10px converted to em
+        margin-bottom: 0.625em; // 10px converted to em
+
         .message {
-            margin-bottom: 10px;
+            margin-bottom: 0.625em; // 10px converted to em
+
             strong {
                 color: $primary-color;
             }
         }
     }
+
     .chat-input {
         display: flex;
+
         textarea {
             flex-grow: 1;
-            padding: 10px;
+            padding: 0.625em; // 10px converted to em
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 0.25em; // 4px converted to em
             resize: none;
         }
+
         button {
-            padding: 10px;
-            margin-left: 10px;
+            padding: 0.625em; // 10px converted to em
+            margin-left: 0.625em; // 10px converted to em
             border: none;
             background-color: $primary-color;
             color: white;
             cursor: pointer;
+
             &:hover {
                 background-color: darken($primary-color, 10%);
             }
@@ -110,14 +239,36 @@ body {
 .chat-history-list {
     .chat-history-item {
         border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 10px;
+        padding: 0.625em; // 10px converted to em
+        margin-bottom: 0.625em; // 10px converted to em
         cursor: pointer;
+
         &:hover {
             background-color: lighten($background-color, 10%);
         }
+
         .chat-preview {
             color: darken($text-color, 20%);
         }
+    }
+}
+
+// Media queries for different screen sizes
+@media (min-width: $tablet) {
+    .login-form {
+        width: 75%; // Adjust the width for tablet
+    }
+}
+
+
+@media (min-width: $desktop) {
+    .login-form {
+        width: 50%; // Adjust the width for desktop
+    }
+}
+
+@media (min-width: $large-desktop) {
+    .login-form {
+        width: 20%; // Adjust the width for large desktop
     }
 }

@@ -1,35 +1,33 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import {appAdminEmail, appAdminPass} from '../../config/config.mjs'
+import { appAdminEmail, appAdminPass } from '../../config/config.mjs';
 import jwt from 'jsonwebtoken';
-
 
 const userSchema = new mongoose.Schema({
   name: String,
-  email:{ type: String, unique: true, required: true },
+  email: { type: String, unique: true, required: true },
   password: String,
   role: String,
-  conversationHistory: Array
+  conversationHistory: Array,
 });
 
 const User = mongoose.model('User', userSchema);
 
 async function initializeUser(name, email, password, role = 'user') {
+  console.log('Initializing user:', name, email, role);
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10)
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
       role,
-      conversationHistory: []
+      conversationHistory: [],
     });
-
     await newUser.save();
-
     console.log('User created successfully');
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error('Error initializing user:', error);
   }
 }
 
@@ -49,7 +47,7 @@ async function initAdminUser() {
 
 async function deleteUser(email) {
   try {
-    await User.findOneAndDelete({ email: email });
+    await User.findOneAndDelete({ email });
     console.log('User deleted successfully');
   } catch (error) {
     console.error('Error deleting user:', error);
@@ -58,13 +56,13 @@ async function deleteUser(email) {
 
 async function readUser(email) {
   try {
-    const user = await User.findOne({ email: email });
-    if (user) {
-      console.log('User data:', user);
-      return user;
-    } else {
+    const user = await User.findOne({ email });
+    if (!user) {
       console.log('User not found');
+    } else {
+      console.log('User found:', user);
     }
+    return user;
   } catch (error) {
     console.error('Error reading user:', error);
   }
@@ -72,13 +70,13 @@ async function readUser(email) {
 
 async function updateUser(email, updatedData) {
   try {
-    const user = await User.findOneAndUpdate({ email: email }, updatedData, { new: true });
-    if (user) {
-      console.log('User updated successfully:', user);
-      return user;
-    } else {
+    const user = await User.findOneAndUpdate({ email }, updatedData, { new: true });
+    if (!user) {
       console.log('User not found');
+    } else {
+      console.log('User updated successfully:', user);
     }
+    return user;
   } catch (error) {
     console.error('Error updating user:', error);
   }
@@ -86,9 +84,7 @@ async function updateUser(email, updatedData) {
 
 async function loginUser(email, password) {
   try {
-    console.log(email);
-    console.log(password);
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email });
     if (!user) {
       throw new Error('User not found');
     }
@@ -97,7 +93,7 @@ async function loginUser(email, password) {
       throw new Error('Invalid password');
     }
 
-    //const jwtToken = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // const jwtToken = jwt.sign({ email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
     return { user };
   } catch (error) {
     console.error('Error logging in:', error);
