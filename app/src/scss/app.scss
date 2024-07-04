@@ -1,274 +1,257 @@
 @import 'fonts'; // Import the fonts SCSS file
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
+
+//-----------------------------------------------------------------------------------
+// BASE VARIABLES
+// ----------------------------------------------------------------------------------
 
 $primary-color: #55E000;
 $low-primary-color: #2F4422;
 $complementary-color: #9100E0;
 $second-complementary-color: #E00065;
+
 $low-complementary-color: #503061;
 $low-second-complementary-color: #613046;
+
 $text-color: #333;
 $background-color: $complementary-color;
+$shadow-color: #131313;
 
-// Screen size variables
-$mobile: 576px;
-$tablet: 768px;
-$desktop: 992px;
-$large-desktop: 1200px;
+$txt-light-color: rgb(196, 196, 196);
+
+
+$primary-gradient-background: linear-gradient(186deg, rgba(49,29,117,1) 0%, rgba(145,0,224,1) 33%, rgba(197,117,253,1) 78%, rgba(243,138,235,1) 100%);
+
+
+// Breakpoints
+$bp-small: 48em; // 768px
+$bp-medium: 64em; // 1024px
+$bp-large: 85.375em; // 1366px
+$bp-xlarge: 120em; // 1920px
+$bp-xxlarge: 160em; // 2560px
+
+// Media Queries
+$mq-small: "(min-width: #{$bp-small})";
+$mq-medium: "(min-width: #{$bp-medium})";
+$mq-large: "(min-width: #{$bp-large})";
+$mq-xlarge: "(min-width: #{$bp-xlarge})";
+$mq-xxlarge: "(min-width: #{$bp-xxlarge})";
+$mq-retina: "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)";
+
+// Font-Size
+$base-font-size: 1em;
+
+// Line-Height
+$base-line-height: 1.5;
+$header-line-height: 1.25;
+
+
+//-----------------------------------------------------------------------------------
+// BASE CLASSES
+// ----------------------------------------------------------------------------------
+
 
 body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    height: 100vh;
+    font-size: $base-font-size;
+    line-height: $base-line-height;
     margin: 0;
-    background-color: $complementary-color;
-    flex-direction: column; // Default for mobile
-}
-.login-form {
-    form {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: center;
+    height: 100vh;
+
+    @media #{$mq-medium} {
+      font-size: $base-font-size*1.2;
+      line-height: $base-line-height*1.2;
     }
-
-    margin: auto;
-    padding: 1.25em; // 20px converted to em
-    background-color: white;
-    border-radius: 0.25em; // 4px converted to em
-    
-    box-shadow: 0.2em 0.2em 0.4em $low-complementary-color; // 2px and 4px converted to em
-    border-style: solid;
-    border-width: medium;
-    border-color: black;
-
-    
-    input {
-        
-        width: 92%;
-        padding: 0.625em; // 10px converted to em
-        margin-bottom: 0.625em; // 10px converted to em
-        border-radius: 0.25em; // 4px converted to em
-
-        border-color: black;
-        border-style: solid;
-        border-width: thin;
-
-        box-shadow: 0.05em 0.05em 0.1em $low-complementary-color; // 2px and 4px converted to em
-        
-        transition: border-color 0.3s;
-
-        &:focus {
-            border-color: $primary-color;
-            outline: none; // Remove default outline
-        }
+  
+    @media #{$mq-large} {
+      font-size: $base-font-size*1.3;
     }
-
-    button {
-        color: $text-color;
-        width: 96%;
-        padding: 0.625em; // 10px converted to em
-        border: none;
-        background-color: $primary-color;
-        border-radius: 0.25em; // 4px converted to em
-        cursor: pointer;
-        border-color: black;
-        border-style: solid;
-        border-width: thin;
-        box-shadow: 0.1em 0.1em 0.2em $low-complementary-color; // 2px and 4px converted to em
-        font-size: larger;
-
-        position: relative;
-        overflow: hidden;
-
-        &:hover {            
-            &:before {
-                transform: translate(-45%, -45%) rotate(45deg) scale(1);
-            }
-        }
-
-        &:before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 200%;
-            height: 200%;
-            background: rgb(213,232,215);
-            background: linear-gradient(0deg, rgb(197, 235, 200) 0%, rgba(210, 230, 210, 0.775) 43%, rgb(191, 230, 195) 100%);
-            filter: hue-rotate(180deg) saturate(0.5) brightness(1.01) blur(0.02em) contrast(4);
-            transform: translate(-50%, -50%) rotate(45deg) scale(0);
-            transition: transform 0.3s;
-            border-radius: inherit; // Ensure the glow effect matches the button's border-radius
-        }
-
+  
+    @media #{$mq-xlarge} {
+      font-size: $base-font-size*1.35;
     }
-
-    h1 {
-        font-size: 1.5em; // Relative font size
-        margin-bottom: 0.75em; // Relative margin
-    }
-
-    label {
-        font-size: 1em; // Relative font size
-    }
-
-    form div {
-        margin-bottom: 0.75em; // Relative margin
-    }
-}
-
-.header {
-    width: 100%;
-    padding: 0.625em; // 10px converted to em
-    background-color: $complementary-color;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 0.125em 0.25em rgba(0, 0, 0, 0.1); // 2px and 4px converted to em
-
-    .logo img {
-        height: 2.5em; // 40px converted to em
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-
-        span {
-            margin-right: 1.25em; // 20px converted to em
-            color: $text-color;
-        }
-
-        a {
-            color: $primary-color;
-            text-decoration: none;
-
-            &:hover {
-                text-decoration: underline;
-            }
-        }
+  
+    @media #{$mq-xxlarge} {
+      font-size: $base-font-size*1.45;
     }
 }
 
 .container {
-    display: flex;
-    flex-grow: 1;
-    flex-direction: column; // Default for mobile
+    background-color: white;
+    margin: 0 4%;
+    padding: 1.25em; 
 
-    @media (min-width: $tablet) {
-        flex-direction: row;
+    @media #{$mq-medium} {
+      margin: 0 8%;
+    }
+  
+    @media #{$mq-large} {
+      margin: 0 12%;
+    }
+  
+    @media #{$mq-xlarge} {
+      margin: 0 18%;
     }
 }
 
-.menu {
+//-----------------------------------------------------------------------------------
+// MIXINS
+// ----------------------------------------------------------------------------------
+
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+}
+@mixin flex-row {
+    display: flex;
+    flex-direction: row;
+}
+@mixin solid-shadow{
+    box-shadow: 0.18em 0.18em 0em $shadow-color; // 2px and 4px converted to em
+}
+@mixin clickable{
+    cursor: pointer;
+}
+@mixin border-standard {
+    border-radius: 0.25em; // 4px converted to em
+    border-color: black;
+    border-style: solid;
+    border-width: 0.08em;
+}
+
+//-----------------------------------------------------------------------------------
+// Ready to use styles
+// ----------------------------------------------------------------------------------
+
+@keyframes hoverAnimation {
+    0% {  transform: translate(0, 0); }
+    100% {  transform: translate(-0.12em, -0.12em); }
+}
+@keyframes hoverAnimation-right {
+    0% {  transform: translate(0, 0); }
+    100% {  transform: translate(0.15em, -0.06em); }
+}
+
+@mixin button-standard {
+    @include border-standard;
+    @include clickable;
+    &:hover {            
+        animation: hoverAnimation 0.2s ease-out forwards;
+        @include solid-shadow;
+    }
+}
+
+@mixin button-standard-right {
+    @include border-standard;
+    @include clickable;
+    &:hover {            
+        animation: hoverAnimation-right 0.2s ease-out forwards;
+        @include solid-shadow;
+    }
+}
+
+@mixin button-accent {
+    @include button-standard;
+    color: $text-color;
+    background-color: $primary-color;
+    font-size: larger;
     width: 100%;
-    background-color: $complementary-color;
-    color: white;
-    display: flex;
-    flex-direction: column;
+}
 
-    @media (min-width: $tablet) {
-        width: 200px;
-    }
-
-    a {
-        padding: 0.9375em; // 15px converted to em
-        color: white;
-        text-decoration: none;
-        border-bottom: 1px solid darken($complementary-color, 10%);
-
-        &:hover {
-            background-color: darken($complementary-color, 10%);
-        }
+@mixin button-light {
+    @include clickable;
+    &:hover {            
+        color:#fff;
     }
 }
 
-.content {
-    flex-grow: 1;
-    padding: 1.25em; // 20px converted to em
-    overflow-y: auto;
-}
-
-.chat-view {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-
-    .chat-history {
-        flex-grow: 1;
-        overflow-y: auto;
-        border: 1px solid #ccc;
-        padding: 0.625em; // 10px converted to em
-        margin-bottom: 0.625em; // 10px converted to em
-
-        .message {
-            margin-bottom: 0.625em; // 10px converted to em
-
-            strong {
-                color: $primary-color;
-            }
-        }
-    }
-
-    .chat-input {
-        display: flex;
-
-        textarea {
-            flex-grow: 1;
-            padding: 0.625em; // 10px converted to em
-            border: 1px solid #ccc;
-            border-radius: 0.25em; // 4px converted to em
-            resize: none;
-        }
-
-        button {
-            padding: 0.625em; // 10px converted to em
-            margin-left: 0.625em; // 10px converted to em
-            border: none;
-            background-color: $primary-color;
-            color: white;
-            cursor: pointer;
-
-            &:hover {
-                background-color: darken($primary-color, 10%);
-            }
-        }
+@mixin bubble {
+    &:hover {            
+        filter: saturate(1.5) hue-rotate(180deg);
     }
 }
 
-.chat-history-list {
-    .chat-history-item {
-        border: 1px solid #ccc;
-        padding: 0.625em; // 10px converted to em
-        margin-bottom: 0.625em; // 10px converted to em
-        cursor: pointer;
+// @mixin menu-item-standard {
+//     color: $text-color;
+//     background-color: $complementary-color;
+//     font-size: larger;
+//     width: 100%;
+// }
 
-        &:hover {
-            background-color: lighten($background-color, 10%);
-        }
+// @mixin menu-item-collapsed {
+//     color: $text-color;
+//     background-color: $low-complementary-color;
+//     font-size: larger;
+//     width: 100%;
 
-        .chat-preview {
-            color: darken($text-color, 20%);
-        }
-    }
+//     @include clickable;
+//     &:hover {            
+//         animation: hoverAnimation 0.2s ease-out forwards;
+//         @include solid-shadow;
+//     }
+// }
+
+.tooltip {
+    position: absolute;
+    background-color: #333;
+    color: #fff !important;
+    padding: 5px;
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+    font-size: 14px !important;
+    text-align: left;
 }
 
-// Media queries for different screen sizes
-@media (min-width: $tablet) {
-    .login-form {
-        width: 75%; // Adjust the width for tablet
-    }
+//-----------------------------------------------------------------------------------
+// Animations
+// ----------------------------------------------------------------------------------
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
 }
 
-
-@media (min-width: $desktop) {
-    .login-form {
-        width: 50%; // Adjust the width for desktop
-    }
+.shake {
+    animation: shake 0.5s;
 }
 
-@media (min-width: $large-desktop) {
-    .login-form {
-        width: 20%; // Adjust the width for large desktop
+//-----------------------------------------------------------------------------------
+// User bubble styles
+// ----------------------------------------------------------------------------------
+
+#user-bubble {
+    position: fixed;
+    bottom: auto;
+    right: 0;
+    margin: 0.3em;
+    padding: 0.3em;
+    color: $low-primary-color;
+    border-radius: 0.25em;
+    font-size: x-large;
+    background-color: bisque;
+    
+    @include clickable;
+    @include bubble;
+
+    scale: 0.7;
+    &:hover {            
+        animation: hoverAnimation 0.2s ease-out forwards;
+        @include solid-shadow;
+    }
+
+    @media #{$mq-medium} {
+        scale: 0.6;
+    }
+
+    div {
+        font-size: small;
     }
 }

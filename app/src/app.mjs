@@ -9,7 +9,8 @@ import {redisClient} from './middlewares/redisClient.mjs';
 import connectDB from './middlewares/mongoClient.mjs';
 import { sessionSecret, port, prefix } from './config/config.mjs';
 import authenticateToken from './middlewares/jwtVerifier.mjs';
-import { initializeUser, initAdminUser, loginUser } from './repository/mongo/userRepo.mjs'; // adjust the path as necessary
+import { initializeUser, initAdminUser, loginUser, deleteUser } from './repository/mongo/userRepo.mjs'; // adjust the path as necessary
+import { debug } from 'console';
 
 // __dirname polyfill for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -41,6 +42,7 @@ app.use(session({
 connectDB();
 
 // Initialize admin user in mongo if not exists
+deleteUser("")
 initAdminUser();
 
 // Configure template engine
@@ -66,15 +68,19 @@ app.get('/', (req, res) => {
 
 // Login route
 app.post('/login', async (req, res) => {
+
+  console.log(req.body);
   const { email, password } = req.body;
   try {
     const { user } = await loginUser(email, password);
     req.session.user = user; // Save user to session
     req.session.save(() => {
-      res.redirect('/dashboard');
     });    
+    res.status(200).json({ message: 'Login successful', user });
+    console.log('Login successful');
   } catch (error) {
     res.status(400).json({ message: error.message });
+    console.log('Login failed');
   }
 });
 
@@ -87,21 +93,41 @@ app.post(prefix+'/login', async (req, res) => {
     req.session.save(() => {
       res.json({ message: 'Login successful', user });
     });
+    console.log('Login successful');
   } catch (error) {
     res.status(400).json({ message: error.message });
+    console.log('Login failed');
   }
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
 });
 
 function saveUserToSession(req, user, callback){
   req.session.user = user; // Save user to session
 }
+
 app.get('/dashboard', (req, res) => {
   console.log(req.cookies);
   console.log(req.session);
   console.log(req.session.user);
 
+  let menuItems = [
+    {id:"mi-0", text:"Chat", path:"c", icon:"chat", tooltiptext:"Chat with game characters."}
+ ,  {id:"mi-1", text:"History", path:"h", icon:"history", tooltiptext:"View chat histories."}
+  ];
+
   const section = req.query.section || 'chat';
-  res.render('dashboard', { user: req.session.user, title:"dashboard", section: section});
+
+  let user_data = { 
+    email: req.session.user.email,
+    role: req.session.user.role,
+    name: req.session.user.name
+  };
+
+  res.render('dashboard', { user: user_data, title:"dashboard", menuItems: menuItems, section: section});
 });
 
 app.get('/profile', authenticateToken, (req, res) => {
@@ -119,11 +145,8 @@ app.get('/getSessionData', authenticateToken, function(req, res) {
     res.send('Username: ' + req.session.username);
 });
 
-
-
 // START SERVER allow restart 
 let server;
-
 
 function startServer() {
   server = app.listen(port, () => console.log(`Server running on port ${port}`));

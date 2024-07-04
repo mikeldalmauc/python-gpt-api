@@ -1,0 +1,95 @@
+
+@import 'app';
+
+.container {
+    background: rgb(227, 213, 234);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    margin:0;
+    height: 100vh;
+    width: 100%;
+    padding: 0;
+}
+
+.menu {
+    background: rgb(49,29,117);
+    background: $primary-gradient-background;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0.6em;
+    color: $txt-light-color;
+    font-weight: bold;
+    transition: width 0.3s ease, font-size 0.3s ease;
+
+    a {
+        @include button-light;
+        color: $txt-light-color;
+        text-overflow: clip;
+        @include flex-row;
+        flex-wrap: nowrap;
+        text-decoration: none;
+    }
+    width: fit-content;
+    
+    .icon {
+        display: inline-block;
+        margin-right: 0.4em;
+        @include button-light;
+    }
+
+    // font-size: 1.3em;
+    // @media #{$mq-medium} {
+    //     font-size: 1.1em;
+    // }
+    // @media #{$mq-large} {
+    //     font-size: 1.15em;
+    // }
+    // @media #{$mq-xlarge} {
+    //     font-size: 1.2em;
+    // }
+    // @media #{$mq-xxlarge} {
+    //     font-size: 1.25em;
+    // }
+
+    .menu-item-text{
+        margin-right: 1em;
+        @include button-light;
+    }
+    .expand-icon{
+        width: fit-content;
+        padding: 0.1em 0.2em 0.1em 0.1em;
+        margin-bottom: 1em;
+        transform: scale(0.8);
+        i {
+            @include button-light;
+        }
+    }
+}
+
+.expand-icon-bubble {
+    display: inline-block;
+    height: fit-content;
+    width: fit-content;
+    font-size: 0.85em;
+    background: $primary-gradient-background;
+    color: $txt-light-color;
+    
+    padding: 0.3em 0.6em 0.4em 0.4em;
+    margin: 0.4em 0em 0.4em 0em;
+
+    @include button-standard-right;
+    @include button-light;
+    @include bubble;
+}
+
+.button-docker {
+    
+}
+
+.tooltip-content {
+    text-align: left;
+}

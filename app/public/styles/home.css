@@ -235,3 +235,67 @@ body {
 #user-bubble div {
   font-size: small;
 }
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(49, 29, 117);
+  background: linear-gradient(186deg, rgb(49, 29, 117) 0%, rgb(145, 0, 224) 33%, rgb(197, 117, 253) 78%, rgb(243, 138, 235) 100%);
+  flex-direction: column;
+}
+
+.login-form {
+  border-radius: 0.25em;
+  border-color: black;
+  border-style: solid;
+  border-width: 0.08em;
+  transform: scale(1.5);
+}
+@media (min-width: 64em) {
+  .login-form {
+    transform: scale(1);
+  }
+}
+@media (min-width: 48em) {
+  .login-form {
+    transform: scale(1.2);
+  }
+}
+.login-form button, .login-form input {
+  padding: 0.625em;
+}
+.login-form form div {
+  margin-bottom: 0.75em;
+}
+.login-form form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.login-form input {
+  cursor: pointer;
+  border-radius: 0.25em;
+  border-color: black;
+  border-style: solid;
+  border-width: 0.08em;
+  width: 92%;
+  margin-bottom: 0.625em;
+}
+.login-form button {
+  border-radius: 0.25em;
+  border-color: black;
+  border-style: solid;
+  border-width: 0.08em;
+  cursor: pointer;
+  color: #333;
+  background-color: #55E000;
+  font-size: larger;
+  width: 100%;
+  margin-top: 0.75em;
+}
+.login-form button:hover {
+  animation: hoverAnimation 0.2s ease-out forwards;
+  box-shadow: 0.18em 0.18em 0em #131313;
+}

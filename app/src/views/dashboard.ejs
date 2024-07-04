@@ -4,18 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="./styles/app.css"> 
+    <link rel="stylesheet" href="./styles/dashboard.css"> 
+    <script src="./js/utils.js"></script>
 </head>
 <body>
-    <%- include('partials/header', { user: user }) %>
+    <%- include('partials/userBubble', { user: user }) %>
     <div class="container">
         <%- include('partials/menu') %>
-        <div class="content">
-            <% if (section === 'chat') { %>
-                <%- include('partials/chat') %>
-            <% } else if (section === 'history') { %>
-                <%- include('partials/history') %>
-            <% } %>
+        <div  id="" class="content">
         </div>
     </div>
 </body>

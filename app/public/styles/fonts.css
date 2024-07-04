@@ -74,6 +74,10 @@
   font-family: "InconsolataNerd", Arial, sans-serif;
 }
 
+div {
+  font-family: "ProFontWindowsNerdPropo", Arial, sans-serif;
+}
+
 body {
   font-family: "InconsolataNerd", Arial, sans-serif;
 }
@@ -84,11 +88,11 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "ProFontWindowsNerdPropo", Arial, sans-serif;
+  font-family: "InconsolataNerd", Arial, sans-serif;
 }
 
 label {
-  font-family: "InconsolataNerd", Arial, sans-serif;
+  font-family: "ProFontWindowsNerdPropo", Arial, sans-serif;
 }
 
 p {

@@ -1,17 +1,36 @@
 const { src, dest, watch, series, parallel } = require('gulp');
-const exec = require('gulp-exec');
+
 const sass = require('gulp-sass')(require('sass'));
+const { exec } = require('child_process');
 
 const cssFiles = 'src/scss/*.scss';
-const jsFiles = 'src/**/*.mjs';
+const nodeFiles = 'src/**/*.mjs';
+const jsFiles = 'src/js/**/*.js';
 
-function jsTask() {
-    return src('.')
-    .pipe(exec('npx nodemon')) // Run node server
-    //.pipe(browserSync.stream()); // Update the browser
-    .pipe(exec.reporter());
+
+function nodeTask(cb) {
+    const server = exec('npx nodemon');
+
+    server.stdout.on('data', function(data) {
+        console.log(data.toString());
+    });
+
+    server.stderr.on('data', function(data) {
+        console.error(data.toString());
+    });
+
+    server.on('exit', function(code) {
+        console.log(`Server exited with code ${code}`);
+    });
+
+    cb();
 }
 
+
+function jsTask() {
+    return src(jsFiles)
+    .pipe(dest('public/js'));
+}
 
 // Task to compile SCSS files to CSS
 function cssTask() {
@@ -22,23 +41,19 @@ function cssTask() {
 }
 
 function watchTask() {
-    // Watch for changes in any SCSS or JS files, and run the scssTask,
-    // watch(
-    //     [jsFiles, cssFiles],
-    //     series(
-    //         parallel(jsTask, cssTask)
-    //     )
-    // );
-
+    //Watch for changes in any SCSS or JS files, and run the scssTask,
     watch(jsFiles, jsTask);
+    watch(nodeFiles, nodeTask);
     watch(cssFiles, cssTask);
 }
 
 // Export everything to run when you run 'gulp'
 module.exports = {
+    nodeTask,
+    cssTask,
+    jsTask,
     default: series(
-        parallel(jsTask, cssTask),
+        parallel(nodeTask, cssTask, jsTask),
         watchTask
     )
-    ,cssTask
   };

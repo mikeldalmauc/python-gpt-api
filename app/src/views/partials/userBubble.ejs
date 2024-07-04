@@ -1,0 +1,26 @@
+
+<i id="user-bubble" class="user-bubble nf nf-md-logout_variant">
+</i>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let bubble = document.getElementById('user-bubble');
+        
+        let content =  
+            `
+                <div class="tooltip-content">
+                    <h3><i class="nf nf-md-logout_variant"></i>  Log Out</h3>
+                    <p>Name: <span id="tooltip-name"><%= user.name %></span></p>
+                    <p>Email: <span id="tooltip-email"><%= user.email %></span></p>
+                    <p>Role: <span id="tooltip-role"><%= user.role %></span></p>
+                </div>
+            `;
+
+        createTooltip(bubble, content, `translate(-8em, 1em)`);
+
+        bubble.onclick = () => {
+            window.location.href = '/logout';
+    };
+    });
+
+</script>

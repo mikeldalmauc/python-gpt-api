@@ -1,4 +1,119 @@
-<div class="menu">
-    <a href="/dashboard?section=chat">Chat</a>
-    <a href="/dashboard?section=history">Historial</a>
+
+<!-- Menu class --> 
+<div class="expand-icon-bubble" id="expand-icon-bubble"><i class="nf nf-oct-sidebar_collapse"></i></div>
+
+<div id="menu-container" class="menu">
+    <div class="mi">
+        <div class="expand-icon" id="expand-icon"><i class="nf nf-oct-sidebar_collapse"></i></div>
+    </div>
+    <% menuItems.forEach(item => { %>
+        <a id="<%= item.id %>" class="mi" href="/<%= item.text.toLowerCase() %>">
+            <span class="icon"><i class="nf nf-md-<%= item.icon %>"></i></span>
+            <span class="menu-item-text"><%= item.text %></span>
+        </a>
+    <% }) %>
 </div>
+        
+
+<script>
+
+    const menu_app = document.getElementById('menu-container');
+
+    let menu_model = {};
+
+    // Dom references
+    let expandIcon;
+    let container;
+    let menuItems;
+    let textItems;
+    let iconItems;  
+    let expandIconBubble;
+
+    function menu_program(){
+
+        menu_model_init();
+        menu_view_init();
+        menu_view();
+
+    }
+
+    function menu_model_init(){
+        menu_model = {
+            viewType : "EXPANDED",
+            user: JSON.parse(`<%- JSON.stringify(user) %>`),
+            menuItems: JSON.parse(`<%- JSON.stringify(menuItems) %>`)
+        };
+    }
+
+    function menu_view_init(){
+
+        // Dom references init
+        expandIcon = document.getElementById('expand-icon');
+        container = document.getElementById('menu-container');
+        expandIconBubble = document.getElementById('expand-icon-bubble');
+        textItems = menu_app.querySelectorAll('.menu-item-text');
+        expandIconBubble = document.getElementById('expand-icon-bubble');
+        menuItems = menu_app.querySelectorAll('.mi');
+
+        // Event listeners
+
+        expandIcon.onclick = () => menu_update("toggleExpanse")
+        expandIconBubble.onclick = () => menu_update("toggleExpanse")
+        // Adjust font size on window resize
+        window.addEventListener('resize', menu_update("adjustFontSize"));
+    }
+
+    function menu_view(){
+        if(menu_model.viewType === "EXPANDED"){
+            expandIconBubble.style.display = "none";
+            container.style.display = "inline-block";
+
+        } else {
+            
+            container.style.display = "none";
+            expandIconBubble.style.display = "inline-block";
+        }
+
+        menu_app.style.width = "fit-content";
+        textItems.forEach(item => item.style.display = menu_model.viewType === "EXPANDED" ? "inline-block" : "none");
+        
+    }
+
+    function menu_update(action){
+        switch(action){
+            case "toggleExpanse":
+                menu_model.viewType = menu_model.viewType === "EXPANDED" ? "COLLAPSED" : "EXPANDED";
+                break;
+            case "resize":
+                adjustFontSize();
+                break;
+            default:
+                break;
+        }
+        menu_view();
+    }
+
+     // Function to adjust font size
+     function adjustFontSize() {
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+        let fontSize = Math.min(containerWidth, containerHeight) / 14; // Example scaling factor
+        container.style.fontSize = `${fontSize}px`;
+    }
+    
+    // START PROGRAM
+
+    menu_program();
+
+    // Add tooltips to menu items
+    menu_model.menuItems.forEach(item => {
+        createTooltip(Array.from(menuItems).find(i => i.id === item.id) , item.tooltiptext, `translate(2em, 3.1em)`);
+    });
+
+    // Add tooltip to expand icon
+    createTooltip(expandIcon, "Cerrar barra lateral", `translate(1em, 1.1em)`);
+
+    // Add tooltip to user bubble
+    createTooltip(expandIconBubble, "Abrir barra lateral", `translate(1em, 1.1em)`);
+
+</script>

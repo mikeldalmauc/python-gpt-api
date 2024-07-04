@@ -1,0 +1,48 @@
+
+@import 'app';
+
+body {
+    @include flex-center;
+    background: rgb(49,29,117);
+    background: linear-gradient(186deg, rgba(49,29,117,1) 0%, rgba(145,0,224,1) 33%, rgba(197,117,253,1) 78%, rgba(243,138,235,1) 100%);
+    flex-direction: column; // Default for mobile
+}
+
+.login-form {
+    @include border-standard;
+
+    transform: scale(1.5);
+
+    @media #{$mq-medium} {
+        transform: scale(1);
+    }    
+    @media #{$mq-small} {
+        transform: scale(1.2);
+    }
+    button, input {
+        padding: 0.625em;
+    }
+
+    form div {
+        margin-bottom: 0.75em; // Relative margin
+    }
+    
+    form {
+        @include flex-center;
+        flex-direction: column;
+    }
+
+    input {
+        @include clickable;
+        @include border-standard;
+        width: 92%;
+        margin-bottom: 0.625em; // 10px converted to em
+    }
+
+    button {
+        @include button-accent;
+        margin-top: 0.75em;
+    }
+
+}
+

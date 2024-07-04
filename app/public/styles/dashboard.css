@@ -235,3 +235,99 @@ body {
 #user-bubble div {
   font-size: small;
 }
+
+.container {
+  background: rgb(227, 213, 234);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  margin: 0;
+  height: 100vh;
+  width: 100%;
+  padding: 0;
+}
+
+.menu {
+  background: rgb(49, 29, 117);
+  background: linear-gradient(186deg, rgb(49, 29, 117) 0%, rgb(145, 0, 224) 33%, rgb(197, 117, 253) 78%, rgb(243, 138, 235) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 0.6em;
+  color: rgb(196, 196, 196);
+  font-weight: bold;
+  transition: width 0.3s ease, font-size 0.3s ease;
+  width: fit-content;
+}
+.menu a {
+  cursor: pointer;
+  color: rgb(196, 196, 196);
+  text-overflow: clip;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  text-decoration: none;
+}
+.menu a:hover {
+  color: #fff;
+}
+.menu .icon {
+  display: inline-block;
+  margin-right: 0.4em;
+  cursor: pointer;
+}
+.menu .icon:hover {
+  color: #fff;
+}
+.menu .menu-item-text {
+  margin-right: 1em;
+  cursor: pointer;
+}
+.menu .menu-item-text:hover {
+  color: #fff;
+}
+.menu .expand-icon {
+  width: fit-content;
+  padding: 0.1em 0.2em 0.1em 0.1em;
+  margin-bottom: 1em;
+  transform: scale(0.8);
+}
+.menu .expand-icon i {
+  cursor: pointer;
+}
+.menu .expand-icon i:hover {
+  color: #fff;
+}
+
+.expand-icon-bubble {
+  display: inline-block;
+  height: fit-content;
+  width: fit-content;
+  font-size: 0.85em;
+  background: linear-gradient(186deg, rgb(49, 29, 117) 0%, rgb(145, 0, 224) 33%, rgb(197, 117, 253) 78%, rgb(243, 138, 235) 100%);
+  color: rgb(196, 196, 196);
+  padding: 0.3em 0.6em 0.4em 0.4em;
+  margin: 0.4em 0em 0.4em 0em;
+  border-radius: 0.25em;
+  border-color: black;
+  border-style: solid;
+  border-width: 0.08em;
+  cursor: pointer;
+  cursor: pointer;
+}
+.expand-icon-bubble:hover {
+  animation: hoverAnimation-right 0.2s ease-out forwards;
+  box-shadow: 0.18em 0.18em 0em #131313;
+}
+.expand-icon-bubble:hover {
+  color: #fff;
+}
+.expand-icon-bubble:hover {
+  filter: saturate(1.5) hue-rotate(180deg);
+}
+
+.tooltip-content {
+  text-align: left;
+}
