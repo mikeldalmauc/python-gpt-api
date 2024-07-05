@@ -2,16 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import { appAdminEmail, appAdminPass } from '../../config/config.mjs';
 import jwt from 'jsonwebtoken';
-
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true, required: true },
-  password: String,
-  role: String,
-  conversationHistory: Array,
-});
-
-const User = mongoose.model('User', userSchema);
+import {User} from './schema.mjs';
 
 async function initializeUser(name, email, password, role = 'user') {
   console.log('Initializing user:', name, email, role);

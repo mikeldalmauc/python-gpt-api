@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="./styles/chat.css"> 
+    <script src="./js/utils.js"></script>
+</head>
+<body>
+    <%- include('partials/userBubble', { user: user }) %>
+    <div class="container">
+        <%- include('partials/menu') %>
+        <div  id="" class="content">
+            <div id="chat-container" class="chat-container">
+                <!-- Chat messages will be dynamically inserted here -->
+            </div>
+            <form id="chat-form" class="chat-form">
+                <input type="text" id="chat-input" class="chat-input" placeholder="Type your message..." required>
+                <button type="submit" class="chat-submit">Send</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatContainer = document.getElementById('chat-container');
+
+            // Function to load chat messages from the API
+            async function loadChatMessages() {
+                try {
+                    const response = await fetch('/api/chat');
+                    const data = await response.json();
+                    
+                    chatContainer.innerHTML =
+                        chatContainer.innerHTML 
+                        + 
+                        data.messages.reduce((prev, curr, i, list) => {
+                            let content = '';
+
+                            if( i == 0 || list[i-1].user !== curr.user) {
+                                // add message to string
+                                content += addUserLabelToChat(curr.user);
+                            }
+                            content += addMessageToChat(curr);
+
+                            // add message to string
+                            return prev + content;
+                        }, "");
+                    
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                    // (message => {
+                    //    if(message !== null )
+                    //         addMessageToChat(message, message.user ? 'user' : 'other')
+                    // });
+                } catch (error) {
+                    console.error('Error loading chat messages:', error);
+                }
+            }  
+            
+            function addUserLabelToChat(user) {
+                let cons = console.log(menu_model.user.email);
+                return `
+                    <div class="participant-label ${user == menu_model.user.email ? "your-name":""} ">
+                        ${user}:
+                    </div>
+                    `; 
+            }   
+
+            // Function to add a message to the chat container
+            function addMessageToChat(data) {
+                return `
+                    <div class="participant-message ${data.user == menu_model.user.email ? "your-message":""}">${data.message}</div>
+                `
+            }
+
+            // Function to send a chat message to the API
+            async function sendChatMessage(message) {
+                try {
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message })
+                    });
+                    const data = await response.json();
+                    addMessageToChat(data);
+                } catch (error) {
+                    console.error('Error sending chat message:', error);
+                }
+            }
+
+          
+
+            // Event listener for the chat form
+            chatForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const message = chatInput.value.trim();
+                if (message) {
+                    sendChatMessage(message);
+                    chatInput.value = '';
+                }
+            });
+
+            // Load chat messages when the page loads
+            loadChatMessages();
+        });
+    </script>
+</body>
+</html>

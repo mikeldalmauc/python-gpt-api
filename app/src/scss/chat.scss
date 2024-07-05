@@ -1,0 +1,67 @@
+@import 'app';
+@import 'menu';
+
+.container {
+    background: rgb(227, 213, 234);
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    margin:0;
+    height: 100vh;
+    width: 100%;
+    padding: 0;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 1em;
+    overflow: hidden;
+}
+
+.chat-container {
+    overflow-x: scroll;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 10px; /* Optional: Adjust scroll padding if needed */
+    width: 100vw;
+    height: 100vh;
+}
+
+.chat-form {
+    display: flex;
+    padding: 1em 0;
+}
+
+.chat-input {
+    flex-grow: 1;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.chat-submit {
+    margin-left: 1em;
+    padding: 0.5em 1em;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.participant-label{
+    text-align: left;
+}
+.participant-message {
+    text-align: left;
+}
+
+.your-name {
+    font-weight: lighter;
+    text-align: right;
+}
+.your-message{
+    text-align: right;
+}

@@ -11,6 +11,7 @@ import { sessionSecret, port, prefix } from './config/config.mjs';
 import authenticateToken from './middlewares/jwtVerifier.mjs';
 import { initializeUser, initAdminUser, loginUser, deleteUser } from './repository/mongo/userRepo.mjs'; // adjust the path as necessary
 import { debug } from 'console';
+import { createAdminChannel, readChannels, readChannel, packMessage, updateChannel, addMessageToChannel} from './repository/mongo/chatRepo.mjs';
 
 // __dirname polyfill for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -35,15 +36,19 @@ app.use(session({
   secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 } // 1 hora de duración
+  cookie: { secure: false, httpOnly: true, maxAge: 1000 * 60 * 60 }, // 1 hora de duración
+  activeChannel: null
 }));
 
 // Connect mongo client
 connectDB();
 
-// Initialize admin user in mongo if not exists
+// DATA CREATION
+//_____________________________________________________________________________________
+
 deleteUser("")
 initAdminUser();
+createAdminChannel();
 
 // Configure template engine
 app.set('view engine', 'ejs');
@@ -66,6 +71,10 @@ app.get('/', (req, res) => {
   }
 });
 
+
+// Login
+//_____________________________________________________________________________________
+
 // Login route
 app.post('/login', async (req, res) => {
 
@@ -73,77 +82,147 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const { user } = await loginUser(email, password);
-    req.session.user = user; // Save user to session
-    req.session.save(() => {
-    });    
+
+  // Save user to session
+    req.session.user = user;
+    req.session.options = readOptions(user)
+    req.session.save();    
+
     res.status(200).json({ message: 'Login successful', user });
     console.log('Login successful');
+
   } catch (error) {
     res.status(400).json({ message: error.message });
     console.log('Login failed');
   }
 });
 
-// API Login route
-app.post(prefix+'/login', async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const { user } = await loginUser(email, password);
-    req.session.user = user; // Save user to session
-    req.session.save(() => {
-      res.json({ message: 'Login successful', user });
-    });
-    console.log('Login successful');
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-    console.log('Login failed');
-  }
-});
 
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
 });
 
-function saveUserToSession(req, user, callback){
-  req.session.user = user; // Save user to session
+
+// Options
+//_____________________________________________________________________________________
+
+/**
+ * Get user options, such as menu items, etc.
+ * TODO extract data from mongo and save on redis for session usage
+ * @param {Object} user
+ * @returns {Object} options
+ */
+function readOptions(user) {
+
+  let options = {};
+
+  options.menuItems = [
+    {id:"mi-0", text:"Chat", path:"c", icon:"chat", tooltiptext:"Chat with game characters."}
+  , {id:"mi-1", text:"History", path:"h", icon:"history", tooltiptext:"View chat histories."}
+  ];
+
+  options.user = { 
+    email: user.email,
+    role: user.role,
+    name: user.name
+  };
+
+  return options;
 }
 
 app.get('/dashboard', (req, res) => {
-  console.log(req.cookies);
-  console.log(req.session);
-  console.log(req.session.user);
-
-  let menuItems = [
-    {id:"mi-0", text:"Chat", path:"c", icon:"chat", tooltiptext:"Chat with game characters."}
- ,  {id:"mi-1", text:"History", path:"h", icon:"history", tooltiptext:"View chat histories."}
-  ];
-
-  const section = req.query.section || 'chat';
-
-  let user_data = { 
-    email: req.session.user.email,
-    role: req.session.user.role,
-    name: req.session.user.name
-  };
-
-  res.render('dashboard', { user: user_data, title:"dashboard", menuItems: menuItems, section: section});
+  res.render('dashboard', req.session.options);
+  //res.render('dashboard', { user: user_data, title:"dashboard", menuItems: menuItems, section: section});
 });
 
-app.get('/profile', authenticateToken, (req, res) => {
-    res.send(`Hello ${req.user.email}, your role is ${req.user.role}`);
-});
+
+// CHAT
+//_____________________________________________________________________________________
+
+// Render Chat page with user options
+app.get('/chat', async (req, res) => {
+
+  try{
+    let channels = await readChannels(req.session.user.email);
+    console.log(channels);
+    if(channels.length > 0) {
+      req.session.activeChannel = channels[0].id;
+      req.session.save();    
+
+      res.render('chat', req.session.options);
+    }else{
+      res.render('chat', req.session.options);
+    }
+  }catch(error){
+    res.render('chat', req.session.options);
+  }
   
-// Example of setting session data
-app.get('/setSessionData', authenticateToken, function(req, res) {
-    req.session.username = 'John Doe';
-    res.send('Session data set successfully!');
 });
-  
-// Example of getting session data
-app.get('/getSessionData', authenticateToken, function(req, res) {
-    res.send('Username: ' + req.session.username);
+
+// Chat messages add
+app.post('/'+prefix+'/chat', async (req, res) => {
+  try{
+
+    if(req.body != null && req.body != "" ) {
+      console.log(req.session.activeChannel);
+      addMessageToChannel(req.session.activeChannel, packMessage(req.session.user.email, req.body.message))
+      .then(updatedChannel => {
+          console.log('Updated Channel:', updatedChannel);
+        }).catch(error => {
+          console.error('Error:', error);
+        });
+
+      console.log("Adding message to channel");
+    }else{
+      console.log("Message not added to channel!!");
+    }
+
+    res.status(200).json(req.body);
+  }catch(error){
+    console.log(error);
+    res.status(500).json({ message: "Error reading channels" });
+  }
+
 });
+
+// Chat messages read
+app.get('/'+prefix+'/chat', async (req, res) => {
+  console.log(req.session.user.email);
+  try{
+    let channels = await readChannels(req.session.user.email);
+    console.log(channels[0].id);
+    if(channels.length > 0) {
+      req.session.activeChannel = channels[0].id;
+      req.session.save();    
+
+      res.status(200).json(channels[0]);
+    }else{
+      res.status(400).json({ message: 'No channels found' });
+    }
+  }catch(error){
+    res.status(500).json({ message: "Error reading channels" });
+  }
+
+});
+
+
+// HISTORY
+//_____________________________________________________________________________________
+
+app.get('/history', (req, res) => {
+  res.render('chat', req.session.options);
+});
+
+
+
+
+
+// Start server
+//_____________________________________________________________________________________
+
+
+
 
 // START SERVER allow restart 
 let server;

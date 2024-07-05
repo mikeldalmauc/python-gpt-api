@@ -169,12 +169,6 @@ body {
     }
 }
 
-@mixin bubble {
-    &:hover {            
-        filter: saturate(1.5) hue-rotate(180deg);
-    }
-}
-
 // @mixin menu-item-standard {
 //     color: $text-color;
 //     background-color: $complementary-color;
@@ -204,6 +198,7 @@ body {
     display: none;
     z-index: 1000;
     font-size: 14px !important;
+    font-weight: lighter;
     text-align: left;
 }
 
@@ -239,11 +234,9 @@ body {
     background-color: bisque;
     
     @include clickable;
-    @include bubble;
 
     scale: 0.7;
     &:hover {            
-        animation: hoverAnimation 0.2s ease-out forwards;
         @include solid-shadow;
     }
 

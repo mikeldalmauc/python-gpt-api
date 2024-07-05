@@ -2,12 +2,28 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Run",
-            "type": "python",
+            "args": [
+                "task"
+            ],
+            "name": "Gulp task",
+            "program": "${workspaceFolder}/app/node_modules/gulp/bin/gulp.js",
             "request": "launch",
-            "program": "application.py",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        }
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "skipFiles": [
+              "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/app/src/app.mjs",
+            "outFiles": [
+              "${workspaceFolder}/app/public/**/*.js"
+            ]
+          }
     ]
 }
