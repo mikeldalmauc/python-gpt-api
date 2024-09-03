@@ -6,7 +6,7 @@ COPY ./app /app
 WORKDIR /app
 
 #COPY ./environment/.production.env .env
-COPY ./environment/dev.env .env
+COPY ./app/.env .env
 
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y \
