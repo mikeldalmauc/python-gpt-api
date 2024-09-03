@@ -63,7 +63,7 @@ services:
     ports:
       - "27017:27017"
     env_file:
-      - ./app/dev.env
+      - ./app/.env
     networks:
       - app-network
 
