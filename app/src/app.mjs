@@ -48,7 +48,7 @@ connectDB();
 
 deleteUser("")
 initAdminUser();
-createAdminChannel();
+//createAdminChannel();
 
 // Configure template engine
 app.set('view engine', 'ejs');

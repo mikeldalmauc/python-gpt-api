@@ -2,7 +2,7 @@
 @import 'menu';
 
 .container {
-    background: rgb(227, 213, 234);
+    background: $background-light-color;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -17,15 +17,14 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: 1em;
-    overflow: hidden;
+    padding: 2em;
+    align-content: center;
+    flex-wrap: nowrap;
+    align-items: center;
 }
 
 .chat-container {
-    overflow-x: scroll;
-    scroll-snap-type: x mandatory;
-    scroll-padding: 10px; /* Optional: Adjust scroll padding if needed */
-    width: 100vw;
+    width: 80%;
     height: 100vh;
 }
 
@@ -64,4 +63,9 @@
 }
 .your-message{
     text-align: right;
+    border-radius: 50%;
+    padding: 0.5em;
+    margin: 0.1em;
+    background-color: #e7e7e7;
+    width: fit-content;
 }
