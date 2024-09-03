@@ -8,21 +8,8 @@
     - [Dependencias](#dependencias)
     - [Variables de Entorno](#variables-de-entorno)
     - [Iniciar el Proyecto](#iniciar-el-proyecto)
-  - [Endpoints](#endpoints)
-    - [Autenticación](#autenticación)
-    - [Conversaciones](#conversaciones)
-    - [Estadísticas](#estadísticas)
-  - [Middleware](#middleware)
-    - [`admin.js`](#adminjs)
-  - [Modelo](#modelo)
-    - [`QueryLog.js`](#querylogjs)
-  - [Vistas](#vistas)
-    - [`chat.ejs`](#chatejs)
-    - [`home.ejs`](#homeejs)
-    - [`login.ejs`](#loginejs)
-  - [Contexto del Personaje](#contexto-del-personaje)
-    - [`character_context.json`](#character_contextjson)
-  - [Licencia](#licencia)
+  - [Conectarse a AWS](#conectarse-a-aws)
+  - [Generar certificados SSL con Docker](#generar-certificados-ssl-con-docker)
 
 ## Descripción
 
@@ -58,54 +45,25 @@ docker-compose --env-file ./environment/dev.env up -d --build
 
 Esto construirá y ejecutará los contenedores necesarios para el servidor Express, Redis y MongoDB.
 
-## Endpoints
+## Conectarse a AWS
 
-### Autenticación
+```bash
+ssh -i /path/key-pair-name.pem instance-user-name@instance-public-dns-name
+```
 
-- `POST /auth/login`: Iniciar sesión con nombre de usuario y contraseña.
-- `POST /auth/register`: Registrar un nuevo usuario. Se puede especificar el rol (`user` o `admin`).
+```bash
+ssh -i ./aws-flask-gpt-api.pem ec2-user@ec2-35-181-229-140.eu-west-3.compute.amazonaws.com
+```
 
-### Conversaciones
+## Generar certificados SSL con Docker
 
-- `POST /api/chat`: Iniciar una conversación con el personaje del videojuego. Requiere autenticación JWT.
+[Generar Certificados SSL con Docker](https://github.com/stakater/dockerfile-ssl-certs-generator)
 
-### Estadísticas
+```bash
+docker run -v ./certs:/certs stakater/ssl-certs-generator:1.0
 
-- `GET /api/stats`: Obtener estadísticas de las consultas realizadas a ChatGPT. Solo accesible para usuarios con rol de administrador.
+docker run -v ./certs:/certs -e SSL_SUBJECT=localhost  stakater/ssl-certs-generator:1.0
 
-## Middleware
+docker run -v ./certs:/certs -e SSL_SUBJECT=ec2-35-181-229-140.eu-west-3.compute.amazonaws.com  stakater/ssl-certs-generator:1.0
 
-### `admin.js`
-
-Middleware para verificar si el usuario tiene el rol de administrador. Utilizado en el endpoint `/api/stats`.
-
-## Modelo
-
-### `QueryLog.js`
-
-Modelo de Mongoose para registrar consultas y respuestas a ChatGPT en MongoDB.
-
-## Vistas
-
-### `chat.ejs`
-
-Página de chat para interactuar con el personaje del videojuego.
-
-### `home.ejs`
-
-Página de inicio.
-
-### `login.ejs`
-
-Página de inicio de sesión y registro.
-
-## Contexto del Personaje
-
-### `character_context.json`
-
-Archivo JSON que contiene el contexto inicial del personaje, incluyendo personalidad, instrucciones y conversaciones de ejemplo.
-
-## Licencia
-
-Este proyecto está licenciado bajo la MIT License.
-
+```
